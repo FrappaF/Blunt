@@ -1,0 +1,60 @@
+# If/Else evaluation
+
+blunt test(x, y)
+{
+    if(x > y)
+    {
+        smoke x;
+    }
+    elseif(x < y) {
+        smoke y;
+    } 
+    else {
+        smoke x;
+    }
+}
+
+roll res with test(10, 11);
+println("The biggest number between 10 and 11 is", res);
+
+blunt areEquals(x, y)
+{
+    if(x == y)
+    {
+        smoke 1;
+    }
+    smoke 0;
+    
+}
+
+roll resEq = areEquals(10, 10);
+println("10 == 10?", resEq);
+
+blunt complexTest(a, b, c)
+{
+    if(a > b and a > c)
+    {
+        smoke a;
+    }
+    elseif(b > a and b > c) {
+        smoke b;
+    } 
+    elseif(not(a > b and a > c)) {
+        smoke c;
+    }
+    else {
+        smoke a + b + c;
+    }
+}
+
+roll res1 with complexTest(5, 10, 15);
+println("Expected: 15, Actual:", res1);
+
+roll res2 with complexTest(20, 10, 5);
+println("Expected: 20, Actual:", res2);
+
+roll res3 with complexTest(10, 20, 10);
+println("Expected: 20, Actual:", res3);
+
+roll res4 with complexTest(10, 10, 10);
+println("Expected: 10, Actual:", res4);

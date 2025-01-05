@@ -1,0 +1,16 @@
+# Classic fibonacci calculation
+
+blunt fib(n)
+{
+    if(n == 1) {
+        smoke 1;
+    }
+    if(n  == 0)
+    {
+        smoke 0;
+    }
+
+    smoke fib(n-1) + fib(n-2)
+}
+
+println("Fib(20):", fib(20))

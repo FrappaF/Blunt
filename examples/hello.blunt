@@ -1,0 +1,9 @@
+## First interaction with the language
+
+# Variable definitions 
+# It is possible to init more than 1 instance of a variable with the same value
+roll 1 joint with "sto tutto fatto";
+roll 1 puro with "madonna";
+
+# Function call
+print(joint, puro, "\n");

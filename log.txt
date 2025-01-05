@@ -1,0 +1,473 @@
+
+STARTING PARSER
+Skipping comment line
+Parsing statement: blunt
+Parsing function definition
+Parsing function argument
+Argument: n
+Parsing function body
+Parsing statement: if
+Parsing ifelse branch
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: n
+Parsing expression TOKEN_INT with precedence 7
+Parsing factor TOKEN_INT with precedence 7
+Added expression: TOKEN_EQUAL
+	Left: AST_VARIABLE
+	Right: AST_INT
+Parsing statement: smoke
+Parsing return
+Parsing expression TOKEN_INT with precedence 0
+Parsing factor TOKEN_INT with precedence 0
+Parsing value: ;
+Parsing value: if
+Parsing statement: if
+Parsing ifelse branch
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: n
+Parsing expression TOKEN_INT with precedence 7
+Parsing factor TOKEN_INT with precedence 7
+Added expression: TOKEN_EQUAL
+	Left: AST_VARIABLE
+	Right: AST_INT
+Parsing statement: smoke
+Parsing return
+Parsing expression TOKEN_INT with precedence 0
+Parsing factor TOKEN_INT with precedence 0
+Parsing value: ;
+Parsing statement: smoke
+Parsing return
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: fib
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: n
+Parsing expression TOKEN_INT with precedence 4
+Parsing factor TOKEN_INT with precedence 4
+Added expression: TOKEN_MINUS
+	Left: AST_VARIABLE
+	Right: AST_INT
+Parsing expression TOKEN_ID with precedence 4
+Parsing factor TOKEN_ID with precedence 4
+Parsing id: fib
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: n
+Parsing expression TOKEN_INT with precedence 4
+Parsing factor TOKEN_INT with precedence 4
+Added expression: TOKEN_MINUS
+	Left: AST_VARIABLE
+	Right: AST_INT
+Added expression: TOKEN_PLUS
+	Left: AST_FUNCTION_CALL
+	Right: AST_FUNCTION_CALL
+Parsed function body
+Parsing value: println
+Parsing statement: println
+Parsing variable
+Parsing id: println
+Parsing expression TOKEN_STRING with precedence 0
+Parsing factor TOKEN_STRING with precedence 0
+Parsing expression TOKEN_ID with precedence 0
+Parsing factor TOKEN_ID with precedence 0
+Parsing id: fib
+Parsing expression TOKEN_INT with precedence 0
+Parsing factor TOKEN_INT with precedence 0
+
+ ----- PARSER TREE -----
+AST_COMPOUND
+  AST_FUNCTION_DEFINITION
+    Name: fib
+    AST_VARIABLE
+      Name: n
+    AST_COMPOUND
+      AST_IF_BRANCH
+        AST_IF
+          AST_EQUAL
+            AST_VARIABLE
+              Name: n
+            AST_INT
+              Value: 1
+          AST_COMPOUND
+            AST_RETURN
+              AST_INT
+                Value: 1
+      AST_IF_BRANCH
+        AST_IF
+          AST_EQUAL
+            AST_VARIABLE
+              Name: n
+            AST_INT
+              Value: 0
+          AST_COMPOUND
+            AST_RETURN
+              AST_INT
+                Value: 0
+      AST_RETURN
+        AST_PLUS
+          AST_FUNCTION_CALL
+            Name: fib
+            AST_MINUS
+              AST_VARIABLE
+                Name: n
+              AST_INT
+                Value: 1
+          AST_FUNCTION_CALL
+            Name: fib
+            AST_MINUS
+              AST_VARIABLE
+                Name: n
+              AST_INT
+                Value: 2
+  AST_FUNCTION_CALL
+    Name: println
+    AST_STRING
+      Value: Fib(3):
+    AST_FUNCTION_CALL
+      Name: fib
+      AST_INT
+        Value: 3
+
+ -----------------------
+
+STARTING VISITOR
+Visiting compound
+Visiting function definition
+Function name: fib
+Function arguments size: 1
+Function argument 0 [AST_VARIABLE]
+Function argument 0: n
+Adding function definition to global scope 0x136706cb0
+Visited compound node 0 [type]: AST_FUNCTION_DEFINITION
+Visiting function call
+Function name: println
+Printing argument 0 with type: AST_STRING
+Printing type: AST_STRING
+Fib(3): Printing argument 1 with type: AST_FUNCTION_CALL
+Visiting function call
+Function name: fib
+Function definition found in global scope 0x136706cb0
+Pushing scope to stack
+Parent scope: 0x0
+New scope: 0x136706cf0
+Passed argument type: AST_INT
+Adding argument to scope: n = 3
+Adding variable definition to local scope 0x136706cf0
+New scope after adding arguments
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Visiting compound
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136706cf0: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 3 == 1
+Visited compound node 0 [type]: NOOP
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136706cf0: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 3 == 0
+Visited compound node 1 [type]: NOOP
+Visiting return [type]: AST_PLUS
+Visited compound node 2 [type]: AST_RETURN
+Return statement found in compound
+Visiting return value from function call
+Visiting term AST_PLUS
+	left: AST_FUNCTION_CALL
+	right: AST_FUNCTION_CALL
+Visiting factor AST_FUNCTION_CALL
+Visiting function call
+Function name: fib
+Function definition found in global scope 0x136706cb0
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Pushing scope to stack
+Parent scope: 0x136706cf0
+New scope: 0x136707100
+Passed argument type: AST_MINUS
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Visiting term AST_MINUS
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136706cf0: n [type: AST_INT]
+Visiting factor AST_INT
+Subtracting 1 from 3
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Adding argument to scope: n = 2
+Adding variable definition to local scope 0x136707100
+New scope after adding arguments
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Visiting compound
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707100: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 2 == 1
+Visited compound node 0 [type]: NOOP
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707100: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 2 == 0
+Visited compound node 1 [type]: NOOP
+Visiting return [type]: AST_PLUS
+Visited compound node 2 [type]: AST_RETURN
+Return statement found in compound
+Visiting return value from function call
+Visiting term AST_PLUS
+	left: AST_FUNCTION_CALL
+	right: AST_FUNCTION_CALL
+Visiting factor AST_FUNCTION_CALL
+Visiting function call
+Function name: fib
+Function definition found in global scope 0x136706cb0
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Pushing scope to stack
+Parent scope: 0x136707100
+New scope: 0x136707600
+Passed argument type: AST_MINUS
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Visiting term AST_MINUS
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707100: n [type: AST_INT]
+Visiting factor AST_INT
+Subtracting 1 from 2
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Adding argument to scope: n = 1
+Adding variable definition to local scope 0x136707600
+New scope after adding arguments
+------ Scope ------
+Scope 0x136707600
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [1]
+-------------------
+Visiting compound
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707600: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 1 == 1
+If condition true
+Visiting compound
+Visiting return [type]: AST_INT
+Visited compound node 0 [type]: AST_RETURN
+Return statement found in compound
+Visited compound node 0 [type]: AST_RETURN
+Return statement found in compound
+Visiting return value from function call
+Popping scope from stack
+Parent scope: 0x136707100
+Popped scope: 0x136707600
+Visiting factor AST_FUNCTION_CALL
+Visiting function call
+Function name: fib
+Function definition found in global scope 0x136706cb0
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Pushing scope to stack
+Parent scope: 0x136707100
+New scope: 0x136707830
+Passed argument type: AST_MINUS
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Visiting term AST_MINUS
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707100: n [type: AST_INT]
+Visiting factor AST_INT
+Subtracting 2 from 2
+------ Scope ------
+Scope 0x136707100
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [2]
+-------------------
+Adding argument to scope: n = 0
+Adding variable definition to local scope 0x136707830
+New scope after adding arguments
+------ Scope ------
+Scope 0x136707830
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [0]
+-------------------
+Visiting compound
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707830: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 0 == 1
+Visited compound node 0 [type]: NOOP
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707830: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 0 == 0
+If condition true
+Visiting compound
+Visiting return [type]: AST_INT
+Visited compound node 0 [type]: AST_RETURN
+Return statement found in compound
+Visited compound node 1 [type]: AST_RETURN
+Return statement found in compound
+Visiting return value from function call
+Popping scope from stack
+Parent scope: 0x136707100
+Popped scope: 0x136707830
+Adding 1 to 0
+Popping scope from stack
+Parent scope: 0x136706cf0
+Popped scope: 0x136707100
+Visiting factor AST_FUNCTION_CALL
+Visiting function call
+Function name: fib
+Function definition found in global scope 0x136706cb0
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Pushing scope to stack
+Parent scope: 0x136706cf0
+New scope: 0x136707d20
+Passed argument type: AST_MINUS
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Visiting term AST_MINUS
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136706cf0: n [type: AST_INT]
+Visiting factor AST_INT
+Subtracting 2 from 3
+------ Scope ------
+Scope 0x136706cf0
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [3]
+-------------------
+Adding argument to scope: n = 1
+Adding variable definition to local scope 0x136707d20
+New scope after adding arguments
+------ Scope ------
+Scope 0x136707d20
+Function definitions size: 0
+Variable definitions size: 1
+Variable definition 0: n [1]
+-------------------
+Visiting compound
+Visiting if branch
+Visiting if
+Visiting term AST_EQUAL
+	left: AST_VARIABLE
+	right: AST_INT
+Visiting factor AST_VARIABLE
+Local variable found in scope 0x136707d20: n [type: AST_INT]
+Visiting factor AST_INT
+Comparing 1 == 1
+If condition true
+Visiting compound
+Visiting return [type]: AST_INT
+Visited compound node 0 [type]: AST_RETURN
+Return statement found in compound
+Visited compound node 0 [type]: AST_RETURN
+Return statement found in compound
+Visiting return value from function call
+Popping scope from stack
+Parent scope: 0x136706cf0
+Popped scope: 0x136707d20
+Adding 1 to 1
+Popping scope from stack
+Parent scope: 0x0
+Popped scope: 0x136706cf0
+Printing type: AST_INT
+2
+Visited compound node 1 [type]: NOOP

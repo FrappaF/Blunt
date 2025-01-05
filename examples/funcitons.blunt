@@ -1,0 +1,60 @@
+# Functions (/ blunts) definition and scopes tests
+
+roll 1 globalVar with "This is a global var";
+
+blunt smokeWeedEveryDay()
+{
+    roll weed with 19;
+    print("SMOKE WEED EVERY DAY!!!\n");
+}
+
+# Blunts with arguments
+blunt printTheString(theString)
+{
+    println(theString);
+}
+
+blunt printTwoString(string1, string2)
+{
+    printTheString(string1);
+    printTheString(string2);
+}
+
+# Blunts with return (smoked) value
+blunt returnAString()
+{
+    roll returnValue with "This should be the last line printed\n";
+    
+    roll midLine with "Smoked";
+
+    blunt returnALot()
+    {
+        roll 2 sushi with "a lot";
+
+        blunt insideJoke()
+        {
+            roll lastScopeVar with "and never give up!\n";
+            print(midLine, sushi, lastScopeVar);
+        }
+
+        insideJoke();
+
+        smoke sushi;
+    }
+
+    # This var should not overwrite the result var in global scope
+    roll result with returnALot();
+
+    printTwoString(midLine, returnALot());
+
+    println("Stoned", result);
+
+    smoke returnValue;
+}
+
+# Fire new blunt
+smokeWeedEveryDay();
+
+# Blunt with return (smoked) value
+roll 1 result with returnAString();
+print(result);

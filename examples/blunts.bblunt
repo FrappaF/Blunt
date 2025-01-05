@@ -1,0 +1,7 @@
+# Variable with multiple value tests
+
+roll single with "Weed";
+println("Expected single value: \"Weed\"\nReal value:", single);
+
+single = 10;
+
