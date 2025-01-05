@@ -3,143 +3,300 @@
 
 #include <stdlib.h>
 
+enum AST_TYPES
+{
+    AST_VARIABLE_DEFINITION,
+    AST_VARIABLE,
+    AST_FUNCTION_DEFINITION,
+    AST_FUNCTION_CALL,
+    AST_RETURN,
+    AST_STRING,
+    AST_INT,
+    AST_COMPOUND,
+    AST_ADD_OP,
+    AST_SUB_OP,
+    AST_MUL_OP,
+    AST_DIV_OP,
+    AST_GT_OP,
+    AST_LT_OP,
+    AST_GTE_OP,
+    AST_LTE_OP,
+    AST_AND_OP,
+    AST_OR_OP,
+    AST_EQUAL_OP,
+    AST_NOT,
+    AST_NESTED_EXPRESSION,
+    AST_IF,
+    AST_ELSE,
+    AST_ELSEIF,
+    AST_IF_ELSE_BRANCH,
+    AST_VARIABLE_COUNT,
+    AST_NOOP
+};
+
 /**
- * @brief Structure representing an Abstract Syntax Tree (AST) node.
- *
- * This structure is used to represent different types of nodes in the AST.
- *
- * @var AST_T::type
- * The type of the AST node, which can be a variable definition, function call, string, variable, or compound.
- *
- * @var AST_T::scope
- * The scope of the AST node.
- *
- * @var AST_T::variable_definition_variable_name
- * The name of the variable being defined (used when type is AST_VARIABLE_DEFINITION).
- *
- * @var AST_T::variable_definition_value
- * The value assigned to the variable being defined (used when type is AST_VARIABLE_DEFINITION).
- *
- * @var AST_T::variable_name
- * The name of the variable (used when type is AST_VARIABLE).
- *
- * @var AST_T::function_call_name
- * The name of the function being called (used when type is AST_FUNCTION_CALL).
- *
- * @var AST_T::function_call_arguments
- * The arguments passed to the function call (used when type is AST_FUNCTION_CALL).
- *
- * @var AST_T::function_call_arguments_size
- * The number of arguments passed to the function call (used when type is AST_FUNCTION_CALL).
- *
- * @var AST_T::string_value
- * The value of the string (used when type is AST_STRING).
- *
- * @var AST_T::compound_value
- * The array of AST nodes that make up the compound statement (used when type is AST_COMPOUND).
- *
- * @var AST_T::compound_size
- * The number of AST nodes in the compound statement (used when type is AST_COMPOUND).
+ * @brief Base structure representing an Abstract Syntax Tree (AST) node.
  */
 typedef struct AST_STRUCT
 {
-    enum
-    {
-        AST_VARIABLE_DEFINITION,
-        AST_VARIABLE_COUNT,
-        AST_VARIABLE,
-        AST_FUNCTION_DEFINITION,
-        AST_FUNCTION_CALL,
-        AST_RETURN,
-        AST_STRING,
-        AST_INT,
-        AST_COMPOUND,
-        AST_MUL,
-        AST_DIV,
-        AST_PLUS,
-        AST_MINUS,
-        AST_AND,
-        AST_OR,
-        AST_NOT,
-        AST_EQUAL,
-        AST_NESTED_EXPRESSION,
-        AST_IF_BRANCH,
-        AST_IF,
-        AST_ELSE,
-        AST_ELSEIF,
-        AST_GT,
-        AST_LT,
-        AST_GTE,
-        AST_LTE,
-        NOOP
-    } type;
+    int type;
+} AST_T;
 
-    /* AST_VARIABLE_DEFINITION */
+/**
+ * @brief Structure representing a variable count AST node.
+ */
+typedef struct AST_VARIABLE_COUNT_STRUCT
+{
+    AST_T base;
+    int variable_count_value;
+} AST_VARIABLE_COUNT_T;
+
+/**
+ * @brief Structure representing a variable definition AST node.
+ */
+typedef struct AST_VARIABLE_DEFINITION_STRUCT
+{
+    AST_T base;
     char *variable_definition_variable_name;
     struct AST_STRUCT *variable_definition_value;
-    struct AST_STRUCT *variable_definition_variable_count;
+    struct AST_VARIABLE_COUNT_T *variable_definition_variable_count;
+} AST_VARIABLE_DEFINITION_T;
 
-    /* AST_VARIABLE */
+/**
+ * @brief Structure representing a variable AST node.
+ */
+typedef struct AST_VARIABLE_STRUCT
+{
+    AST_T base;
     char *variable_name;
+} AST_VARIABLE_T;
 
-    /* AST_VARIABLE_COUNT */
-    int variable_count;
-
-    /* AST_FUNCTION_CALL */
+/**
+ * @brief Structure representing a function call AST node.
+ */
+typedef struct AST_FUNCTION_CALL_STRUCT
+{
+    AST_T base;
     char *function_call_name;
     struct AST_STRUCT **function_call_arguments;
     size_t function_call_arguments_size;
-    // struct AST_STRUCT *function_call_result;
+} AST_FUNCTION_CALL_T;
 
-    /* AST_FUNCTION_DEFINITION */
+/**
+ * @brief Structure representing a function definition AST node.
+ */
+typedef struct AST_FUNCTION_DEFINITION_STRUCT
+{
+    AST_T base;
     char *function_definition_name;
     struct AST_STRUCT *function_definition_body;
-    struct AST_STRUCT **function_definition_arguments;
+    struct AST_VARIABLE_DEFINITION_T **function_definition_arguments;
     size_t function_definition_arguments_size;
+} AST_FUNCTION_DEFINITION_T;
 
-    /* AST_RETURN */
+/**
+ * @brief Structure representing a return AST node.
+ */
+typedef struct AST_RETURN_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *return_value;
+} AST_RETURN_T;
 
-    /* AST_STRING */
+/**
+ * @brief Structure representing a string AST node.
+ */
+typedef struct AST_STRING_STRUCT
+{
+    AST_T base;
     char *string_value;
+} AST_STRING_T;
 
-    /* AST_INT */
+/**
+ * @brief Structure representing an integer AST node.
+ */
+typedef struct AST_INT_STRUCT
+{
+    AST_T base;
     int int_value;
+} AST_INT_T;
 
-    /* AST_COMPOUND */
+/**
+ * @brief Structure representing a compound AST node.
+ */
+typedef struct AST_COMPOUND_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT **compound_value;
     size_t compound_size;
+} AST_COMPOUND_T;
 
-    /* AST_IF_BRANCH */
+/**
+ * @brief Structure representing an if-branch AST node.
+ */
+typedef struct AST_IF_ELSE_BRANCH_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT **if_else_compound_value;
     size_t if_else_compound_size;
+} AST_IF_ELSE_BRANCH_T;
 
-    /* AST_MUL, AST_DIV, AST_PLUS, AST_MINUS
-     * AST_GT, AST_LT, AST_GTE, AST_LTE
-     * AST_AND, AST_OR
-     */
+/**
+ * @brief Structure representing an addition operation AST node.
+ */
+typedef struct AST_ADD_OP_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *left;
     struct AST_STRUCT *right;
-    int result;
+} AST_ADD_OP_T;
 
-    /* AST_NOT */
+/**
+ * @brief Structure representing a subtraction operation AST node.
+ */
+typedef struct AST_SUB_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_SUB_OP_T;
+
+/**
+ * @brief Structure representing a multiplication operation AST node.
+ */
+typedef struct AST_MUL_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_MUL_OP_T;
+
+/**
+ * @brief Structure representing a division operation AST node.
+ */
+typedef struct AST_DIV_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_DIV_OP_T;
+
+/**
+ * @brief Structure representing an AND operation AST node.
+ */
+typedef struct AST_AND_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_AND_OP_T;
+
+/**
+ * @brief Structure representing an OR operation AST node.
+ */
+typedef struct AST_OR_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_OR_OP_T;
+
+/**
+ * @brief Structure representing a greater than operation AST node.
+ */
+typedef struct AST_GT_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_GT_OP_T;
+
+/**
+ * @brief Structure representing a less than operation AST node.
+ */
+typedef struct AST_LT_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_LT_OP_T;
+
+/**
+ * @brief Structure representing a greater than or equal to operation AST node.
+ */
+typedef struct AST_GTE_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_GTE_OP_T;
+
+/**
+ * @brief Structure representing a less than or equal to operation AST node.
+ */
+typedef struct AST_LTE_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_LTE_OP_T;
+
+/**
+ * @brief Structure representing an equal operation AST node.
+ */
+typedef struct AST_EQUAL_OP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *left;
+    struct AST_STRUCT *right;
+} AST_EQUAL_OP_T;
+
+/**
+ * @brief Structure representing a not operation AST node.
+ */
+typedef struct AST_NOT_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *not_expression;
+} AST_NOT_T;
 
-    /* AST_NESTED_EXPRESSION */
+/**
+ * @brief Structure representing a nested expression AST node.
+ */
+typedef struct AST_NESTED_EXPRESSION_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *nested_expression;
+} AST_NESTED_EXPRESSION_T;
 
-    /* AST_IF */
+/**
+ * @brief Structure representing an if AST node.
+ */
+typedef struct AST_IF_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *if_condition;
     struct AST_STRUCT *if_body;
+} AST_IF_T;
 
-    /* AST_ELSE */
+/**
+ * @brief Structure representing an else AST node.
+ */
+typedef struct AST_ELSE_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *else_body;
+} AST_ELSE_T;
 
-    /* AST_ELSEIF */
+/**
+ * @brief Structure representing an elseif AST node.
+ */
+typedef struct AST_ELSEIF_STRUCT
+{
+    AST_T base;
     struct AST_STRUCT *elseif_condition;
     struct AST_STRUCT *elseif_body;
-
-} AST_T;
+} AST_ELSEIF_T;
 
 /**
  * Initializes an AST node with the given type.

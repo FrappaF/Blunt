@@ -32,7 +32,7 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the variable definition.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINITION_T *node);
 
 /**
  * Visits a variable node in the AST.
@@ -40,7 +40,7 @@ AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the variable.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_variable(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node);
 
 /**
  * Visits a string node in the AST.
@@ -48,7 +48,7 @@ AST_T *visitor_visit_variable(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the string.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_string(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_string(visitor_T *visitor, AST_STRING_T *node);
 
 /**
  * Visits a compound node in the AST.
@@ -56,7 +56,7 @@ AST_T *visitor_visit_string(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the compound.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_compound(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_compound(visitor_T *visitor, AST_COMPOUND_T *node);
 
 /**
  * Visits a function call node in the AST.
@@ -64,7 +64,7 @@ AST_T *visitor_visit_compound(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the function call.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_function_call(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node);
 
 /**
  * Visits a function definition node in the AST.
@@ -72,7 +72,7 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the function definition.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *node);
 
 /**
  * Visits a return node in the AST.
@@ -80,7 +80,7 @@ AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the return.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_return(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_return(visitor_T *visitor, AST_RETURN_T *node);
 
 /**
  * Visits an integer node in the AST.
@@ -88,7 +88,7 @@ AST_T *visitor_visit_return(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the integer.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_int(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_int(visitor_T *visitor, AST_INT_T *node);
 
 /**
  * Visits a if branch in the AST.
@@ -96,7 +96,7 @@ AST_T *visitor_visit_int(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the term.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_IF_ELSE_BRANCH_T *node);
 
 /**
  * Visits a not node in the AST.
@@ -104,7 +104,7 @@ AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_T *node);
  * @param node The AST node representing the term.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_not(visitor_T *visitor, AST_T *node);
+AST_T *visitor_visit_not(visitor_T *visitor, AST_NOT_T *node);
 
 /**
  * Copy an AST node.

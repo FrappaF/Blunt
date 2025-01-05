@@ -72,14 +72,14 @@ void print_scope(scope_T *scope)
     LOG_PRINT("Function definitions size: %lu\n", scope->function_definitions_size);
     for (size_t i = 0; i < scope->function_definitions_size; i++)
     {
-        AST_T *fdef = scope->function_definitions[i];
+        AST_FUNCTION_DEFINITION_T *fdef = scope->function_definitions[i];
         LOG_PRINT("Function definition %lu: %s\n", i, fdef->function_definition_name);
     }
 
     LOG_PRINT("Variable definitions size: %lu\n", scope->variable_definitions_size);
     for (size_t i = 0; i < scope->variable_definitions_size; i++)
     {
-        AST_T *vdef = scope->variable_definitions[i];
+        AST_VARIABLE_DEFINITION_T *vdef = scope->variable_definitions[i];
         LOG_PRINT("Variable definition %lu: %s \n", i, vdef->variable_definition_variable_name);
     }
     LOG_PRINT("-------------------\n");
@@ -115,7 +115,7 @@ AST_T *scope_get_function_definition(scope_T *scope, const char *fname)
     }
     for (int i = 0; i < scope->function_definitions_size; i++)
     {
-        AST_T *fdef = scope->function_definitions[i];
+        AST_FUNCTION_DEFINITION_T *fdef = scope->function_definitions[i];
 
         if (strcmp(fdef->function_definition_name, fname) == 0)
         {
@@ -154,7 +154,7 @@ AST_T *scope_get_variable_definition(scope_T *scope, const char *name)
     }
     for (int i = 0; i < scope->variable_definitions_size; i++)
     {
-        AST_T *vdef = scope->variable_definitions[i];
+        AST_VARIABLE_DEFINITION_T *vdef = scope->variable_definitions[i];
         LOG_PRINT("Variable definition in scope %p: %s\n", scope, vdef->variable_definition_variable_name);
         if (strcmp(vdef->variable_definition_variable_name, name) == 0)
         {

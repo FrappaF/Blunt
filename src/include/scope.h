@@ -5,10 +5,10 @@
 
 typedef struct SCOPE_STRUCT
 {
-    AST_T **function_definitions;
+    AST_FUNCTION_DEFINITION_T **function_definitions;
     size_t function_definitions_size;
 
-    AST_T **variable_definitions;
+    AST_VARIABLE_DEFINITION_T **variable_definitions;
     size_t variable_definitions_size;
 
     AST_T *result;
