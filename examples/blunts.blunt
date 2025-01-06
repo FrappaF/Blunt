@@ -11,5 +11,8 @@ roll 3 multiple with [1, 2, 3];
 single = multiple.0;
 println("Expected first value: 1\nReal value:", single);
 
+multiple.1 = 5;
+println("Array [1, 5, 3]:", multiple);
+
 roll 3 same with 1;
 println("Same multiple values [1, 1, 1]:", same.0, same.1, same.2);

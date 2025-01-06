@@ -610,11 +610,24 @@ AST_T *parser_parse_dot_expression(parser_T *parser)
 
     parser_eat(parser, TOKEN_DOT);
 
+    char *dot_index_chars = parser->current_token->value;
+
     AST_T *ast_dot_expression = parser_parse_expression(parser);
 
     AST_DOT_EXPRESSION_T *ast_dot_expression_node = (AST_DOT_EXPRESSION_T *)init_ast(AST_DOT_EXPRESSION);
     ast_dot_expression_node->dot_expression_variable_name = variable_name;
     ast_dot_expression_node->dot_index = ast_dot_expression;
+
+    if (parser->current_token->type == TOKEN_EQUALS)
+    {
+        parser_eat(parser, TOKEN_EQUALS);
+        AST_VARIABLE_ASSIGNMENT_T *ast_variable_assignment = (AST_VARIABLE_ASSIGNMENT_T *)init_ast(AST_VARIABLE_ASSIGNMENT);
+        ast_variable_assignment->variable_assignment_name = strcat(variable_name, ".");
+        ast_variable_assignment->variable_assignment_name = strcat(ast_variable_assignment->variable_assignment_name, dot_index_chars);
+        ast_variable_assignment->variable_assignment_value = parser_parse_expression(parser);
+
+        return (AST_T *)ast_variable_assignment;
+    }
 
     return (AST_T *)ast_dot_expression_node;
 }

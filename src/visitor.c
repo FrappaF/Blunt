@@ -224,6 +224,11 @@ AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *nod
 
     LOG_PRINT("Variable found: %s [type: %s]\n", node->variable_name, ast_type_to_string(variable_definition->variable_definition_value->type));
 
+    if (index == -1)
+    {
+        return variable_definition->variable_definition_value;
+    }
+
     if (variable_definition->variable_definition_variable_count <= index)
     {
         log_error("Index out of bounds\n");
@@ -271,6 +276,89 @@ AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGN
         exit(1);
     }
 
+    // Check if name is in form 'name.index'
+    char *dot = strchr(node->variable_assignment_name, '.');
+    if (dot)
+    {
+        char *variable_name = strtok(node->variable_assignment_name, ".");
+        char *indexName = strtok(NULL, ".");
+        if (!variable_name || !index)
+        {
+            log_error("Invalid dot expression\n");
+            exit(1);
+        }
+        LOG_PRINT("Variable name: %s\tindex: %s\n", variable_name, indexName);
+
+        AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, variable_name);
+        if (!variable_definition)
+        {
+            log_error("Variable '%s' not defined\n", variable_name);
+            exit(1);
+        }
+
+        int index = atoi(indexName);
+        // If index is not an integer search for variable with that name
+        if (index == 0 && strcmp(indexName, "0") != 0)
+        {
+            AST_VARIABLE_DEFINITION_T *index_definition = visitor_get_variable_definition(visitor, indexName);
+            if (!index_definition)
+            {
+                log_error("Index '%s' not defined\n", index);
+                exit(1);
+            }
+            AST_T *index_value = visitor_visit(visitor, index_definition->variable_definition_value);
+            if (index_value->type != AST_INT)
+            {
+                log_error("Index must be an integer\n");
+                exit(1);
+            }
+            index = ((AST_INT_T *)index_value)->int_value;
+        }
+
+        if (index >= variable_definition->variable_definition_variable_count)
+        {
+            log_error("Index out of bounds\n");
+            exit(1);
+        }
+
+        if (variable_definition->variable_definition_value->type == AST_ARRAY)
+        {
+            LOG_PRINT("Variable is an array, changing the index element\n");
+            AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+            if (array->array_size <= index)
+            {
+                log_error("Index out of bounds\n");
+                exit(1);
+            }
+            array->array_value[index] = visitor_visit(visitor, node->variable_assignment_value);
+            return (AST_T *)array->array_value[index];
+        }
+        else
+        {
+            LOG_PRINT("Variable is not an array, changing the value to array\n");
+            AST_T *old_value = variable_definition->variable_definition_value;
+            variable_definition->variable_definition_value = (AST_ARRAY_T *)init_ast(AST_ARRAY);
+            AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+            array->array_size = ((AST_VARIABLE_COUNT_T *)variable_definition->variable_definition_variable_count)->variable_count_value;
+            array->array_value = calloc(array->array_size, sizeof(struct AST_STRUCT *));
+            for (int i = 0; i < array->array_size; i++)
+            {
+                if (i == index)
+                {
+                    LOG_PRINT("Setting index %d to new value\n", i);
+                    array->array_value[i] = visitor_visit(visitor, node->variable_assignment_value);
+                }
+                else
+                {
+                    LOG_PRINT("Copying old value to index %d\n", i);
+                    array->array_value[i] = old_value;
+                }
+            }
+
+            return (AST_T *)array->array_value[index];
+        }
+    }
+
     AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_assignment_name);
 
     if (!variable_definition)
@@ -290,7 +378,7 @@ AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGN
 
 AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node)
 {
-    return visitor_visit_variable_with_index(visitor, node, 0);
+    return visitor_visit_variable_with_index(visitor, node, -1);
 }
 
 AST_T *visitor_visit_string(visitor_T *visitor, AST_STRING_T *node)
@@ -711,6 +799,17 @@ static void builtin_print(visitor_T *visitor, AST_T **arguments, size_t argument
         case AST_VARIABLE_DEFINITION:
             LOG_PRINT("Variable definition value: %s\n", ast_type_to_string(((AST_VARIABLE_DEFINITION_T *)visited_ast)->variable_definition_value->type));
             builtin_print(visitor, (AST_T **)&((AST_VARIABLE_DEFINITION_T *)visited_ast)->variable_definition_value, 1);
+            break;
+        case AST_ARRAY:
+            LOG_PRINT("Array size: %lu\n", ((AST_ARRAY_T *)visited_ast)->array_size);
+            for (size_t j = 0; j < ((AST_ARRAY_T *)visited_ast)->array_size; j++)
+            {
+                builtin_print(visitor, (AST_T **)&((AST_ARRAY_T *)visited_ast)->array_value[j], 1);
+                if (j < ((AST_ARRAY_T *)visited_ast)->array_size - 1)
+                {
+                    printf(" ");
+                }
+            }
             break;
         default:
             log_error("Unsupported type for printing\n");
