@@ -9,6 +9,107 @@ static void print_indent(int indent)
         LOG_PRINT("  ");
 }
 
+size_t ast_get_size(AST_T *ast)
+{
+    size_t size = 1;
+
+    switch (ast->type)
+    {
+    case AST_VARIABLE_DEFINITION:
+        size = sizeof(AST_VARIABLE_DEFINITION_T);
+        break;
+    case AST_VARIABLE:
+        size = sizeof(AST_VARIABLE_T);
+        break;
+    case AST_FUNCTION_DEFINITION:
+        size = sizeof(AST_FUNCTION_DEFINITION_T);
+        break;
+    case AST_FUNCTION_CALL:
+        size = sizeof(AST_FUNCTION_CALL_T);
+        break;
+    case AST_RETURN:
+        size = sizeof(AST_RETURN_T);
+        break;
+    case AST_STRING:
+        size = sizeof(AST_STRING_T);
+        break;
+    case AST_INT:
+        size = sizeof(AST_INT_T);
+        break;
+    case AST_ARRAY:
+        size = sizeof(AST_ARRAY_T);
+        break;
+    case AST_COMPOUND:
+        size = sizeof(AST_COMPOUND_T);
+        break;
+    case AST_IF:
+        size = sizeof(AST_IF_T);
+        break;
+    case AST_ELSE:
+        size = sizeof(AST_ELSE_T);
+        break;
+    case AST_ELSEIF:
+        size = sizeof(AST_ELSEIF_T);
+        break;
+    case AST_IF_ELSE_BRANCH:
+        size = sizeof(AST_IF_ELSE_BRANCH_T);
+        break;
+    case AST_ADD_OP:
+        size = sizeof(AST_ADD_OP_T);
+        break;
+    case AST_SUB_OP:
+        size = sizeof(AST_SUB_OP_T);
+        break;
+    case AST_MUL_OP:
+        size = sizeof(AST_MUL_OP_T);
+        break;
+    case AST_DIV_OP:
+        size = sizeof(AST_DIV_OP_T);
+        break;
+    case AST_GT_OP:
+        size = sizeof(AST_GT_OP_T);
+        break;
+    case AST_LT_OP:
+        size = sizeof(AST_LT_OP_T);
+        break;
+    case AST_GTE_OP:
+        size = sizeof(AST_GTE_OP_T);
+        break;
+    case AST_LTE_OP:
+        size = sizeof(AST_LTE_OP_T);
+        break;
+    case AST_AND_OP:
+        size = sizeof(AST_AND_OP_T);
+        break;
+    case AST_OR_OP:
+        size = sizeof(AST_OR_OP_T);
+        break;
+    case AST_EQUAL_OP:
+        size = sizeof(AST_EQUAL_OP_T);
+        break;
+    case AST_NOT:
+        size = sizeof(AST_NOT_T);
+        break;
+    case AST_NESTED_EXPRESSION:
+        size = sizeof(AST_NESTED_EXPRESSION_T);
+        break;
+    case AST_VARIABLE_COUNT:
+        size = sizeof(AST_VARIABLE_COUNT_T);
+        break;
+    case AST_NOOP:
+        size = sizeof(AST_T);
+        break;
+    case AST_VARIABLE_ASSIGNMENT:
+        size = sizeof(AST_VARIABLE_ASSIGNMENT_T);
+        break;
+    default:
+        size = sizeof(AST_T);
+        break;
+    }
+
+    return size;
+}
+
 AST_T *init_ast(int type)
 {
     AST_T *ast = calloc(1, sizeof(struct AST_STRUCT));
@@ -25,12 +126,28 @@ AST_T *init_ast(int type)
         variable_definition->variable_definition_variable_count = NULL;
         return (AST_T *)variable_definition;
     }
+    case AST_DOT_EXPRESSION:
+    {
+        AST_DOT_EXPRESSION_T *dot_expression = calloc(1, sizeof(struct AST_DOT_EXPRESSION_STRUCT));
+        dot_expression->base = *ast;
+        dot_expression->dot_expression_variable_name = NULL;
+        dot_expression->dot_index = NULL;
+        return (AST_T *)dot_expression;
+    }
     case AST_VARIABLE:
     {
         AST_VARIABLE_T *variable = calloc(1, sizeof(struct AST_VARIABLE_STRUCT));
         variable->base = *ast;
         variable->variable_name = NULL;
         return (AST_T *)variable;
+    }
+    case AST_VARIABLE_ASSIGNMENT:
+    {
+        AST_VARIABLE_ASSIGNMENT_T *variable_assignment = calloc(1, sizeof(struct AST_VARIABLE_ASSIGNMENT_STRUCT));
+        variable_assignment->base = *ast;
+        variable_assignment->variable_assignment_name = NULL;
+        variable_assignment->variable_assignment_value = NULL;
+        return (AST_T *)variable_assignment;
     }
     case AST_FUNCTION_DEFINITION:
     {
@@ -71,6 +188,14 @@ AST_T *init_ast(int type)
         int_node->base = *ast;
         int_node->int_value = 0;
         return (AST_T *)int_node;
+    }
+    case AST_ARRAY:
+    {
+        AST_ARRAY_T *array_node = calloc(1, sizeof(struct AST_ARRAY_STRUCT));
+        array_node->base = *ast;
+        array_node->array_value = NULL;
+        array_node->array_size = 0;
+        return (AST_T *)array_node;
     }
     case AST_COMPOUND:
     {
@@ -252,6 +377,8 @@ const char *ast_type_to_string(int type)
         return "AST_COMPOUND";
     case AST_INT:
         return "AST_INT";
+    case AST_ARRAY:
+        return "AST_ARRAY";
     case AST_ADD_OP:
         return "AST_ADD_OP";
     case AST_SUB_OP:
@@ -286,9 +413,12 @@ const char *ast_type_to_string(int type)
         return "AST_ELSE";
     case AST_ELSEIF:
         return "AST_ELSEIF";
+    case AST_VARIABLE_ASSIGNMENT:
+        return "AST_VARIABLE_ASSIGNMENT";
+    case AST_DOT_EXPRESSION:
+        return "AST_DOT_EXPRESSION";
     case AST_NOOP:
         return "AST_NOOP";
-
     default:
         LOG_PRINT("Unknown AST type: %d\n", type);
         return "UNKNOWN";
@@ -338,6 +468,15 @@ void ast_print(AST_T *node, int indent)
         print_indent(indent + 1);
         LOG_PRINT("Value: %d\n", ((AST_INT_T *)node)->int_value);
         break;
+    case AST_ARRAY:
+        for (size_t i = 0; i < ((AST_ARRAY_T *)node)->array_size; i++)
+            ast_print(((AST_ARRAY_T *)node)->array_value[i], indent + 1);
+        break;
+    case AST_VARIABLE_ASSIGNMENT:
+        print_indent(indent + 1);
+        LOG_PRINT("Name: %s\n", ((AST_VARIABLE_ASSIGNMENT_T *)node)->variable_assignment_name);
+        ast_print(((AST_VARIABLE_ASSIGNMENT_T *)node)->variable_assignment_value, indent + 1);
+        break;
     case AST_COMPOUND:
         for (size_t i = 0; i < ((AST_COMPOUND_T *)node)->compound_size; i++)
             ast_print(((AST_COMPOUND_T *)node)->compound_value[i], indent + 1);
@@ -376,6 +515,11 @@ void ast_print(AST_T *node, int indent)
         break;
     case AST_NESTED_EXPRESSION:
         ast_print(((AST_NESTED_EXPRESSION_T *)node)->nested_expression, indent + 1);
+        break;
+    case AST_DOT_EXPRESSION:
+        print_indent(indent + 1);
+        LOG_PRINT("Name: %s\n", ((AST_DOT_EXPRESSION_T *)node)->dot_expression_variable_name);
+        ast_print(((AST_DOT_EXPRESSION_T *)node)->dot_index, indent + 1);
         break;
     default:
         break;

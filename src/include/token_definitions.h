@@ -87,6 +87,15 @@
 // Token for equal keyword (==)
 #define TOKEN_EQUAL 29
 
+// Token type for the left square bracket ']'
+#define TOKEN_LSQUARE 30
+
+// Token type for the right square bracket ']'
+#define TOKEN_RSQUARE 31
+
+// Token type for the dot '.'
+#define TOKEN_DOT 32
+
 // variable definition identifier
 #define ID_DEF_VAR "roll"
 

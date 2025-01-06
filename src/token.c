@@ -27,6 +27,9 @@ lexer_token_map_T token_map[] = {
     {'/', TOKEN_DIV},
     {'<', TOKEN_LT},
     {'>', TOKEN_GT},
+    {'[', TOKEN_LSQUARE},
+    {']', TOKEN_RSQUARE},
+    {'.', TOKEN_DOT},
     {'\0', 0} // End of map marker
 };
 
@@ -92,7 +95,14 @@ const char *token_type_to_string(int type)
         return "TOKEN_NOT";
     case TOKEN_EQUAL:
         return "TOKEN_EQUAL";
+    case TOKEN_LSQUARE:
+        return "TOKEN_LSQUARE";
+    case TOKEN_RSQUARE:
+        return "TOKEN_RSQUARE";
+    case TOKEN_DOT:
+        return "TOKEN_DOT";
     default:
-        return "UNKNOWN";
+        LOG_PRINT("Unknown token type: %d\n", type);
+        return "TOKEN_UNKNOWN";
     }
 }

@@ -7,11 +7,14 @@ enum AST_TYPES
 {
     AST_VARIABLE_DEFINITION,
     AST_VARIABLE,
+    AST_VARIABLE_COUNT,
+    AST_VARIABLE_ASSIGNMENT,
     AST_FUNCTION_DEFINITION,
     AST_FUNCTION_CALL,
     AST_RETURN,
     AST_STRING,
     AST_INT,
+    AST_ARRAY,
     AST_COMPOUND,
     AST_ADD_OP,
     AST_SUB_OP,
@@ -30,7 +33,7 @@ enum AST_TYPES
     AST_ELSE,
     AST_ELSEIF,
     AST_IF_ELSE_BRANCH,
-    AST_VARIABLE_COUNT,
+    AST_DOT_EXPRESSION,
     AST_NOOP
 };
 
@@ -63,6 +66,16 @@ typedef struct AST_VARIABLE_DEFINITION_STRUCT
 } AST_VARIABLE_DEFINITION_T;
 
 /**
+ * @brief Structure representing a dot expression AST node.
+ */
+typedef struct AST_DOT_EXPRESSION_STRUCT
+{
+    AST_T base;
+    char *dot_expression_variable_name;
+    struct AST_STRUCT *dot_index;
+} AST_DOT_EXPRESSION_T;
+
+/**
  * @brief Structure representing a variable AST node.
  */
 typedef struct AST_VARIABLE_STRUCT
@@ -70,6 +83,16 @@ typedef struct AST_VARIABLE_STRUCT
     AST_T base;
     char *variable_name;
 } AST_VARIABLE_T;
+
+/**
+ * @brief Structure representing a variable assignment AST node.
+ */
+typedef struct AST_VARIABLE_ASSIGNMENT_STRUCT
+{
+    AST_T base;
+    char *variable_assignment_name;
+    struct AST_STRUCT *variable_assignment_value;
+} AST_VARIABLE_ASSIGNMENT_T;
 
 /**
  * @brief Structure representing a function call AST node.
@@ -120,6 +143,16 @@ typedef struct AST_INT_STRUCT
     AST_T base;
     int int_value;
 } AST_INT_T;
+
+/**
+ * @brief Structure representing an array AST node.
+ */
+typedef struct AST_ARRAY_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT **array_value;
+    size_t array_size;
+} AST_ARRAY_T;
 
 /**
  * @brief Structure representing a compound AST node.
@@ -304,6 +337,13 @@ typedef struct AST_ELSEIF_STRUCT
  * @return A pointer to the initialized AST node.
  */
 AST_T *init_ast(int type);
+
+/**
+ * Returns the size of the AST node based on its type.
+ * @param ast The AST node to get the size of.
+ * @return The size of the AST node and its children.
+ */
+size_t ast_get_size(AST_T *ast);
 
 /**
  * Returns the string representation of the AST type.

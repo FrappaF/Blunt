@@ -1,0 +1,15 @@
+# Variable with multiple value tests
+
+roll single with "Weed";
+println("Expected single value: \"Weed\"\nReal value:", single);
+
+single = 10;
+println("Expected new variable value: 10\nReal value:", single);
+
+roll 3 multiple with [1, 2, 3];
+
+single = multiple.0;
+println("Expected first value: 1\nReal value:", single);
+
+roll 3 same with 1;
+println("Same multiple values [1, 1, 1]:", same.0, same.1, same.2);

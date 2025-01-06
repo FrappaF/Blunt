@@ -122,6 +122,13 @@ AST_T *parser_parse_string(parser_T *parser);
 AST_T *parser_parse_variable(parser_T *parser);
 
 /**
+ * Parses a dot expression.
+ * @param parser The parser instance.
+ * @return The parsed AST node representing the nested expression.
+ */
+AST_T *parser_parse_dot_expression(parser_T *parser);
+
+/**
  * Parses an identifier, which could be a variable or a function call.
  * @param parser The parser instance.
  * @return The parsed AST node representing the identifier.
@@ -136,11 +143,25 @@ AST_T *parser_parse_id(parser_T *parser);
 AST_T *parser_parse_variable_count(parser_T *parser);
 
 /**
+ * Parses a variable assignment statement.
+ * @param parser The parser instance.
+ * @return The parsed AST node representing the variable assignment.
+ */
+AST_T *parser_parse_variable_assignment(parser_T *parser);
+
+/**
  * Parses an integer literal.
  * @param parser The parser instance.
  * @return The parsed AST node representing the integer literal.
  */
 AST_T *parser_parse_int(parser_T *parser);
+
+/**
+ * Parses an array.
+ * @param parser The parser instance.
+ * @return The parsed AST node representing the array.
+ */
+AST_T *parser_parse_array(parser_T *parser);
 
 /**
  * Parses a function argument.

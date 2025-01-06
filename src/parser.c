@@ -306,7 +306,7 @@ int get_precedence(int token_type)
     case TOKEN_DIV:
         return 5;
     default:
-        return 0;
+        return -1;
     }
 }
 
@@ -468,6 +468,10 @@ AST_T *parser_parse_factor_with_precedence(parser_T *parser, int precedence)
     {
         node = parser_parse_string(parser);
     }
+    else if (parser->current_token->type == TOKEN_LSQUARE)
+    {
+        node = parser_parse_array(parser);
+    }
     else if (parser->current_token->type == TOKEN_LPAREN)
     {
         parser_eat(parser, TOKEN_LPAREN);
@@ -583,6 +587,38 @@ AST_T *parser_parse_function_call(parser_T *parser)
     return (AST_T *)ast_function_call;
 }
 
+AST_T *parser_parse_variable_assignment(parser_T *parser)
+{
+    LOG_PRINT("Parsing variable assignment\n");
+    char *variable_name = parser->prev_token->value;
+
+    parser_eat(parser, TOKEN_EQUALS);
+
+    AST_T *ast_variable_assignment_value = parser_parse_expression(parser);
+
+    AST_VARIABLE_ASSIGNMENT_T *ast_variable_assignment = (AST_VARIABLE_ASSIGNMENT_T *)init_ast(AST_VARIABLE_ASSIGNMENT);
+    ast_variable_assignment->variable_assignment_name = variable_name;
+    ast_variable_assignment->variable_assignment_value = ast_variable_assignment_value;
+
+    return (AST_T *)ast_variable_assignment;
+}
+
+AST_T *parser_parse_dot_expression(parser_T *parser)
+{
+    LOG_PRINT("Parsing dot expression\n");
+    char *variable_name = parser->prev_token->value;
+
+    parser_eat(parser, TOKEN_DOT);
+
+    AST_T *ast_dot_expression = parser_parse_expression(parser);
+
+    AST_DOT_EXPRESSION_T *ast_dot_expression_node = (AST_DOT_EXPRESSION_T *)init_ast(AST_DOT_EXPRESSION);
+    ast_dot_expression_node->dot_expression_variable_name = variable_name;
+    ast_dot_expression_node->dot_index = ast_dot_expression;
+
+    return (AST_T *)ast_dot_expression_node;
+}
+
 AST_T *parser_parse_id(parser_T *parser)
 {
     LOG_PRINT("Parsing id: %s\n", parser->current_token->value);
@@ -593,11 +629,55 @@ AST_T *parser_parse_id(parser_T *parser)
     {
         return parser_parse_function_call(parser);
     }
+    if (parser->current_token->type == TOKEN_EQUALS)
+    {
+        return parser_parse_variable_assignment(parser);
+    }
+    if (parser->current_token->type == TOKEN_LSQUARE)
+    {
+        return parser_parse_array(parser);
+    }
+    if (parser->current_token->type == TOKEN_DOT)
+    {
+        return parser_parse_dot_expression(parser);
+    }
 
     AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
     ast_variable->variable_name = token_name;
 
     return (AST_T *)ast_variable;
+}
+
+AST_T *parser_parse_array(parser_T *parser)
+{
+    LOG_PRINT("Parsing array\n");
+    parser_eat(parser, TOKEN_LSQUARE);
+
+    AST_ARRAY_T *ast_array = (AST_ARRAY_T *)init_ast(AST_ARRAY);
+
+    while (parser->current_token->type != TOKEN_RSQUARE)
+    {
+        AST_T *ast_expression = parser_parse_expression(parser);
+
+        int last_idx = ++ast_array->array_size;
+
+        // size_t expression_size = ast_get_size(ast_expression);
+
+        ast_array->array_value = realloc(
+            ast_array->array_value,
+            (last_idx + 1) * sizeof(struct AST_STRUCT *));
+
+        ast_array->array_value[last_idx - 1] = ast_expression;
+
+        if (parser->current_token->type == TOKEN_COMMA)
+        {
+            parser_eat(parser, TOKEN_COMMA);
+        }
+    }
+
+    parser_eat(parser, TOKEN_RSQUARE);
+
+    return (AST_T *)ast_array;
 }
 
 AST_T *parser_parse_int(parser_T *parser)
