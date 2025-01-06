@@ -43,6 +43,23 @@ AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINI
 AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node);
 
 /**
+ * Visits a variable node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the variable.
+ * @param index The index of the variable.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *node, int index);
+
+/**
+ * Visits a variable assignment node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the variable assignment.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node);
+
+/**
  * Visits a string node in the AST.
  * @param visitor The visitor.
  * @param node The AST node representing the string.
@@ -91,9 +108,17 @@ AST_T *visitor_visit_return(visitor_T *visitor, AST_RETURN_T *node);
 AST_T *visitor_visit_int(visitor_T *visitor, AST_INT_T *node);
 
 /**
+ * Visits an array node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the array.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_array(visitor_T *visitor, AST_ARRAY_T *node);
+
+/**
  * Visits a if branch in the AST.
  * @param visitor The visitor.
- * @param node The AST node representing the term.
+ * @param node The AST node representing the if.
  * @return The result of the visit.
  */
 AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_IF_ELSE_BRANCH_T *node);
@@ -101,17 +126,25 @@ AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_IF_ELSE_BRANCH_T *node);
 /**
  * Visits a not node in the AST.
  * @param visitor The visitor.
- * @param node The AST node representing the term.
+ * @param node The AST node representing the not.
  * @return The result of the visit.
  */
 AST_T *visitor_visit_not(visitor_T *visitor, AST_NOT_T *node);
 
 /**
- * Copy an AST node.
- * @param node The AST node representing the term.
+ * Visits a dot expression node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the dot.
  * @return The result of the visit.
  */
-AST_T *copy_ast(AST_T *node);
+AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *node);
+
+/**
+ * Get a variable definition from the visitor.
+ * @param visitor The visitor.
+ * @param variable_definition The variable definition to add.
+ */
+AST_VARIABLE_DEFINITION_T *visitor_get_variable_definition(visitor_T *visitor, char *variable_name);
 
 /**
  * Gets the value of a node in the AST.

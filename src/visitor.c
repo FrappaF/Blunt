@@ -58,6 +58,12 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
         return visitor_visit_return(visitor, (AST_RETURN_T *)node);
     case AST_IF_ELSE_BRANCH:
         return visitor_visit_if_branch(visitor, (AST_IF_ELSE_BRANCH_T *)node);
+    case AST_VARIABLE_ASSIGNMENT:
+        return visitor_visit_variable_assignment(visitor, (AST_VARIABLE_ASSIGNMENT_T *)node);
+    case AST_DOT_EXPRESSION:
+        return visitor_visit_dot_expression(visitor, (AST_DOT_EXPRESSION_T *)node);
+    case AST_ARRAY:
+        return visitor_visit_array(visitor, (AST_ARRAY_T *)node);
     case AST_MUL_OP:
     case AST_DIV_OP:
     case AST_ADD_OP:
@@ -70,6 +76,20 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
     }
 }
 
+AST_T *visitor_visit_array(visitor_T *visitor, AST_ARRAY_T *node)
+{
+    LOG_PRINT("Visiting array\n");
+
+    for (size_t i = 0; i < node->array_size; i++)
+    {
+        LOG_PRINT("Visiting array element %lu\n", i);
+        AST_T *array_value = visitor_visit(visitor, node->array_value[i]);
+        node->array_value[i] = array_value;
+    }
+
+    return (AST_T *)node;
+}
+
 AST_T *visitor_visit_return(visitor_T *visitor, AST_RETURN_T *node)
 {
     if (!node->return_value)
@@ -80,6 +100,38 @@ AST_T *visitor_visit_return(visitor_T *visitor, AST_RETURN_T *node)
 
     LOG_PRINT("Visiting return [type]: %s\n", ast_type_to_string(node->return_value->type));
     return (AST_T *)node;
+}
+
+AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *node)
+{
+    LOG_PRINT("Visiting dot expression\n");
+
+    if (!node->dot_expression_variable_name)
+    {
+        log_error("Dot expression variable name is NULL\n");
+        exit(1);
+    }
+
+    LOG_PRINT("Variable name: %s\n", node->dot_expression_variable_name);
+
+    if (!node->dot_index)
+    {
+        log_error("Dot index is NULL\n");
+        exit(1);
+    }
+
+    AST_T *dot_index = visitor_visit(visitor, node->dot_index);
+
+    if (dot_index->type != AST_INT)
+    {
+        log_error("Dot index must be an integer\n");
+        exit(1);
+    }
+
+    int index = ((AST_INT_T *)dot_index)->int_value;
+    AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+    variable->variable_name = node->dot_expression_variable_name;
+    return visitor_visit_variable_with_index(visitor, variable, index);
 }
 
 AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *node)
@@ -157,36 +209,88 @@ AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINI
     return (AST_T *)node;
 }
 
-AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node)
+AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *node, int index)
 {
-    if (!node->variable_name)
+
+    LOG_PRINT("Visiting variable with index %d\n", index);
+
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_name);
+
+    if (!variable_definition)
     {
-        log_error("Variable name is NULL\n");
+        log_error("Variable '%s' not defined\n", node->variable_name);
         exit(1);
     }
 
+    LOG_PRINT("Variable found: %s [type: %s]\n", node->variable_name, ast_type_to_string(variable_definition->variable_definition_value->type));
+
+    if (variable_definition->variable_definition_variable_count <= index)
+    {
+        log_error("Index out of bounds\n");
+        exit(1);
+    }
+
+    if (variable_definition->variable_definition_value->type == AST_ARRAY)
+    {
+        AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+        return array->array_value[index];
+    }
+
+    return variable_definition->variable_definition_value;
+}
+
+AST_VARIABLE_DEFINITION_T *visitor_get_variable_definition(visitor_T *visitor, char *variable_name)
+{
     scope_stack_T *current_scope_stack = visitor->scope_stack;
     while (current_scope_stack)
     {
-
-        AST_VARIABLE_DEFINITION_T *local_variable_definition = scope_get_variable_definition(current_scope_stack->scope, node->variable_name);
-        if (local_variable_definition)
+        AST_VARIABLE_DEFINITION_T *variable_definition = scope_get_variable_definition(current_scope_stack->scope, variable_name);
+        if (variable_definition)
         {
-            LOG_PRINT("Local variable found in scope %p: %s [type: %s]\n", current_scope_stack->scope, node->variable_name, ast_type_to_string(local_variable_definition->variable_definition_value->type));
-            return local_variable_definition->variable_definition_value;
+            return variable_definition;
         }
         current_scope_stack = current_scope_stack->parent;
     }
 
-    AST_VARIABLE_DEFINITION_T *global_variable_definition = scope_get_variable_definition(visitor->global_scope, node->variable_name);
-    if (global_variable_definition)
+    return scope_get_variable_definition(visitor->global_scope, variable_name);
+}
+
+AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node)
+{
+    LOG_PRINT("Visiting variable assignment\n");
+
+    if (!node->variable_assignment_name)
     {
-        LOG_PRINT("Variable found in global scope %p: %s [type: %s]\n", visitor->global_scope, node->variable_name, ast_type_to_string(global_variable_definition->variable_definition_value->type));
-        return global_variable_definition->variable_definition_value;
+        log_error("Variable assignment name is NULL\n");
+        exit(1);
     }
 
-    log_error("Variable '%s' not defined\n", node->variable_name);
-    exit(1);
+    if (!node->variable_assignment_value)
+    {
+        log_error("Variable assignment value is NULL\n");
+        exit(1);
+    }
+
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_assignment_name);
+
+    if (!variable_definition)
+    {
+        log_error("Variable '%s' not defined\n", node->variable_assignment_name);
+        exit(1);
+    }
+
+    LOG_PRINT("Variable name: %s\n", node->variable_assignment_name);
+
+    LOG_PRINT("Previous value type: %s\n", ast_type_to_string(variable_definition->variable_definition_value->type));
+    variable_definition->variable_definition_value = visitor_visit(visitor, node->variable_assignment_value);
+    LOG_PRINT("New value type: %s\n", ast_type_to_string(variable_definition->variable_definition_value->type));
+
+    return (AST_T *)variable_definition->variable_definition_value;
+}
+
+AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node)
+{
+    return visitor_visit_variable_with_index(visitor, node, 0);
 }
 
 AST_T *visitor_visit_string(visitor_T *visitor, AST_STRING_T *node)
