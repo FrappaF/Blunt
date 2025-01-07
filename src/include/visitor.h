@@ -60,6 +60,15 @@ AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *nod
 AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node);
 
 /**
+ * Visits a variable assignment node with specific index in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the variable assignment.
+ * @param index The index of the variable.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_variable_assignment_with_index(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node, int index);
+
+/**
  * Visits a string node in the AST.
  * @param visitor The visitor.
  * @param node The AST node representing the string.

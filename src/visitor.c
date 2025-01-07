@@ -120,7 +120,21 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
         exit(1);
     }
 
-    AST_T *dot_index = visitor_visit(visitor, node->dot_index);
+    AST_T *dot_index = NULL;
+
+    int is_assignment = node->dot_index->type == AST_VARIABLE_ASSIGNMENT;
+
+    if (is_assignment)
+    {
+        AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+        variable->variable_name = ((AST_VARIABLE_ASSIGNMENT_T *)node->dot_index)->variable_assignment_name;
+        LOG_PRINT("Visiting %s\n", variable->variable_name);
+        dot_index = visitor_visit(visitor, variable);
+    }
+    else
+    {
+        dot_index = visitor_visit(visitor, node->dot_index);
+    }
 
     if (dot_index->type != AST_INT)
     {
@@ -131,6 +145,21 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     int index = ((AST_INT_T *)dot_index)->int_value;
     AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
     variable->variable_name = node->dot_expression_variable_name;
+
+    if (is_assignment)
+    {
+        AST_VARIABLE_ASSIGNMENT_T *variable_assignment = (AST_VARIABLE_ASSIGNMENT_T *)init_ast(AST_VARIABLE_ASSIGNMENT);
+
+        // Create variable name in form 'name.index'
+        char *variable_name = strcat(node->dot_expression_variable_name, ".");
+        variable_name = strcat(variable_name, ((AST_VARIABLE_ASSIGNMENT_T *)node->dot_index)->variable_assignment_name);
+        LOG_PRINT("Variable dot name: %s\n", variable_name);
+        variable_assignment->variable_assignment_name = variable_name;
+        variable_assignment->variable_assignment_value = ((AST_VARIABLE_ASSIGNMENT_T *)node->dot_index)->variable_assignment_value;
+
+        return visitor_visit_variable_assignment_with_index(visitor, variable_assignment, index);
+    }
+
     return visitor_visit_variable_with_index(visitor, variable, index);
 }
 
@@ -260,9 +289,9 @@ AST_VARIABLE_DEFINITION_T *visitor_get_variable_definition(visitor_T *visitor, c
     return scope_get_variable_definition(visitor->global_scope, variable_name);
 }
 
-AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node)
+AST_T *visitor_visit_variable_assignment_with_index(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node, int index)
 {
-    LOG_PRINT("Visiting variable assignment\n");
+    LOG_PRINT("Visiting variable assignment for %s with index %d\n", node->variable_assignment_name, index);
 
     if (!node->variable_assignment_name)
     {
@@ -282,7 +311,7 @@ AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGN
     {
         char *variable_name = strtok(node->variable_assignment_name, ".");
         char *indexName = strtok(NULL, ".");
-        if (!variable_name || !index)
+        if (!variable_name || !indexName)
         {
             log_error("Invalid dot expression\n");
             exit(1);
@@ -315,7 +344,7 @@ AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGN
             index = ((AST_INT_T *)index_value)->int_value;
         }
 
-        if (index >= variable_definition->variable_definition_variable_count)
+        if (index >= variable_definition->variable_definition_variable_count || index < 0)
         {
             log_error("Index out of bounds\n");
             exit(1);
@@ -360,20 +389,37 @@ AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGN
     }
 
     AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_assignment_name);
-
     if (!variable_definition)
     {
         log_error("Variable '%s' not defined\n", node->variable_assignment_name);
         exit(1);
     }
 
-    LOG_PRINT("Variable name: %s\n", node->variable_assignment_name);
+    if (index == -1)
+    {
+        variable_definition->variable_definition_value = visitor_visit(visitor, node->variable_assignment_value);
+        return variable_definition->variable_definition_value;
+    }
 
-    LOG_PRINT("Previous value type: %s\n", ast_type_to_string(variable_definition->variable_definition_value->type));
-    variable_definition->variable_definition_value = visitor_visit(visitor, node->variable_assignment_value);
-    LOG_PRINT("New value type: %s\n", ast_type_to_string(variable_definition->variable_definition_value->type));
+    if (variable_definition->variable_definition_variable_count <= index)
+    {
+        log_error("Index out of bounds\n");
+        exit(1);
+    }
 
-    return (AST_T *)variable_definition->variable_definition_value;
+    if (variable_definition->variable_definition_value->type == AST_ARRAY)
+    {
+        AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+        array->array_value[index] = visitor_visit(visitor, node->variable_assignment_value);
+        return array->array_value[index];
+    }
+
+    return visitor_visit_variable_assignment(visitor, node);
+}
+
+AST_T *visitor_visit_variable_assignment(visitor_T *visitor, AST_VARIABLE_ASSIGNMENT_T *node)
+{
+    return visitor_visit_variable_assignment_with_index(visitor, node, -1);
 }
 
 AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node)
