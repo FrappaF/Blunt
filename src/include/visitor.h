@@ -149,6 +149,14 @@ AST_T *visitor_visit_not(visitor_T *visitor, AST_NOT_T *node);
 AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *node);
 
 /**
+ * Visits a for loop node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the term.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node);
+
+/**
  * Get a variable definition from the visitor.
  * @param visitor The visitor.
  * @param variable_definition The variable definition to add.

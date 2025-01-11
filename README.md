@@ -105,40 +105,35 @@ print("SMOKE WEED EVERY DAY!!!\n");
 ```
 blunt printTheString(theString)
 {
-print(theString);
-}blunt printTwoString(string1, string2)
+  print(theString);
+}
+
+blunt printTwoString(string1, string2)
 {
-printTheString(string1);
-printTheString(string2);
+  printTheString(string1);
+  printTheString(string2);
 }
 ```
 
 ## Blunts with return (smoked) value
 
 ```
-blunt returnAString()
+# Classic fibonacci calculation
+
+blunt fib(n)
 {
-roll returnValue with "This should be the last line printed\n";roll midLine with "Smoked";blunt returnALot()
-{
-roll 2 sushi with "a lot";blunt insideJoke()
-{
-roll lastScopeVar with "and never give up!\n";
-print(midLine, sushi, lastScopeVar);
-}insideJoke();smoke sushi;
-}roll result with returnALot();
+    if(n == 1) {
+        smoke 1;
+    }
+    if(n  == 0)
+    {
+        smoke 0;
+    }
 
-
-printTwoString(midLine, returnALot());
-
-print("Stoned", result, "\n");
-
-smoke returnValue;
+    smoke fib(n-1) + fib(n-2)
 }
 
-smokeWeedEveryDay();
-
-roll 1 result with returnAString();
-print(result);
+println("Fib(20):", fib(20))
 ```
 
 ## Expressions evaluation tests

@@ -34,6 +34,7 @@ enum AST_TYPES
     AST_ELSEIF,
     AST_IF_ELSE_BRANCH,
     AST_DOT_EXPRESSION,
+    AST_FOR_LOOP,
     AST_NOOP
 };
 
@@ -330,6 +331,18 @@ typedef struct AST_ELSEIF_STRUCT
     struct AST_STRUCT *elseif_condition;
     struct AST_STRUCT *elseif_body;
 } AST_ELSEIF_T;
+
+/**
+ * @brief Structure representing a for loop AST node.
+ */
+typedef struct AST_FOR_LOOP_STRUCT
+{
+    AST_T base;
+    struct AST_STRUCT *for_loop_variable;
+    struct AST_STRUCT *for_loop_condition;
+    struct AST_STRUCT *for_loop_increment;
+    struct AST_STRUCT *for_loop_body;
+} AST_FOR_LOOP_T;
 
 /**
  * Initializes an AST node with the given type.

@@ -70,6 +70,8 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
     case AST_SUB_OP:
     case AST_NESTED_EXPRESSION:
         return visitor_visit_term(visitor, node);
+    case AST_FOR_LOOP:
+        return visitor_visit_for_loop(visitor, (AST_FOR_LOOP_T *)node);
     default:
         LOG_PRINT("Node of type: [%s] not supported\n", ast_type_to_string(node->type));
         return init_ast(AST_NOOP);

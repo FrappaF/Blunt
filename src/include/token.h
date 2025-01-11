@@ -41,4 +41,17 @@ typedef struct
 
 extern lexer_token_map_T token_map[];
 
+/**
+ * Structure representing a mapping between an identifier name and a token type.
+ * @var id_name The identifier name to map.
+ * @var token_type The token type to map to.
+ */
+typedef struct
+{
+    char *id_name;
+    int token_type;
+} lexer_id_map_T;
+
+extern lexer_id_map_T id_map[];
+
 #endif // TOKEN_H
