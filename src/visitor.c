@@ -629,6 +629,10 @@ int visitor_get_node_value(visitor_T *visitor, AST_T *node)
 
 AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node)
 {
+    if (node->type == AST_NESTED_EXPRESSION)
+    {
+        return visitor_visit_factor(visitor, node);
+    }
     // Use add operation as a base
     AST_ADD_OP_T *op = (AST_ADD_OP_T *)node;
 
@@ -734,6 +738,8 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node)
         return visitor_visit_term(visitor, node);
     case AST_NOT:
         return visitor_visit_not(visitor, (AST_NOT_T *)node);
+    case AST_DOT_EXPRESSION:
+        return visitor_visit_dot_expression(visitor, (AST_DOT_EXPRESSION_T *)node);
     default:
         log_error("Unknown node type: %s\n", ast_type_to_string(node->type));
         exit(1);
@@ -791,6 +797,69 @@ AST_T *visitor_visit_if_branch(visitor_T *visitor, AST_IF_ELSE_BRANCH_T *node)
             return visitor_visit(visitor, else_branch->else_body);
         }
     }
+
+    return init_ast(AST_NOOP);
+}
+
+AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node)
+{
+    LOG_PRINT("Visiting for loop\n");
+
+    if (!node->for_loop_increment)
+    {
+        log_error("For loop increment is NULL\n");
+        exit(1);
+    }
+
+    if (node->for_loop_increment->type != AST_VARIABLE)
+    {
+        log_error("For loop increment must be a variable\n");
+        exit(1);
+    }
+
+    // Search for the incerement variable definition
+    AST_VARIABLE_DEFINITION_T *increment_variable_definition = visitor_get_variable_definition(
+        visitor,
+        ((AST_VARIABLE_T *)node->for_loop_increment)->variable_name);
+
+    // Push a new scope for the for loop
+    visitor->scope_stack = push_scope_to_stack(visitor->scope_stack, init_scope());
+
+    if (!increment_variable_definition)
+    {
+        LOG_PRINT("Increment variable definition not found, creating one\n");
+        AST_VARIABLE_T *increment_variable = (AST_VARIABLE_T *)node->for_loop_increment;
+        increment_variable_definition = (AST_VARIABLE_DEFINITION_T *)init_ast(AST_VARIABLE_DEFINITION);
+        // Variable name
+        increment_variable_definition->variable_definition_variable_name = increment_variable->variable_name;
+        // Variable value
+        increment_variable_definition->variable_definition_value = (AST_T *)init_ast(AST_INT);
+        ((AST_INT_T *)increment_variable_definition->variable_definition_value)->int_value = 0;
+
+        // Variable count
+        increment_variable_definition->variable_definition_variable_count = (AST_T *)init_ast(AST_VARIABLE_COUNT);
+        ((AST_VARIABLE_COUNT_T *)increment_variable_definition->variable_definition_variable_count)->variable_count_value = 1;
+
+        // Add the variable definition to the scope
+        visitor_add_variable_definition(visitor, (AST_T *)increment_variable_definition);
+    }
+
+    if (increment_variable_definition->variable_definition_value->type != AST_INT)
+    {
+        log_error("Increment variable must be an integer\n");
+        exit(1);
+    }
+
+    while (visitor_get_node_value(visitor, node->for_loop_condition))
+    {
+        visitor_visit(visitor, node->for_loop_body);
+
+        // Increment by one the value of increment variable
+        ((AST_INT_T *)increment_variable_definition->variable_definition_value)->int_value++;
+    }
+
+    // Pop the scope for the for loop
+    visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
 
     return init_ast(AST_NOOP);
 }
