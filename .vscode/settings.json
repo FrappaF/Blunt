@@ -1,7 +1,0 @@
-{
-  "files.associations": {
-    "*.embeddedhtml": "html",
-    "ctype.h": "c",
-    "logger.h": "c"
-  }
-}
