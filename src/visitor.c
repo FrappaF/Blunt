@@ -817,6 +817,16 @@ AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node)
         exit(1);
     }
 
+    AST_VARIABLE_DEFINITION_T *for_variable_definition = visitor_get_variable_definition(
+        visitor,
+        ((AST_VARIABLE_T *)node->for_loop_variable)->variable_name);
+
+    if (!for_variable_definition)
+    {
+        log_error("For loop variable definition not found\n");
+        exit(1);
+    }
+
     // Search for the incerement variable definition
     AST_VARIABLE_DEFINITION_T *increment_variable_definition = visitor_get_variable_definition(
         visitor,
@@ -848,6 +858,21 @@ AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node)
     {
         log_error("Increment variable must be an integer\n");
         exit(1);
+    }
+
+    if (!node->for_loop_condition)
+    {
+        // Creating default condition i < var count
+        LOG_PRINT("For loop condition is NULL, creating default one\n");
+        AST_LT_OP_T *condition = (AST_LT_OP_T *)init_ast(AST_LT_OP);
+        condition->left = node->for_loop_increment;
+
+        AST_VARIABLE_COUNT_T *variable_count = for_variable_definition->variable_definition_variable_count;
+        AST_INT_T *int_value = (AST_INT_T *)init_ast(AST_INT);
+        int_value->int_value = variable_count->variable_count_value;
+        condition->right = (AST_T *)int_value;
+
+        node->for_loop_condition = (AST_T *)condition;
     }
 
     while (visitor_get_node_value(visitor, node->for_loop_condition))

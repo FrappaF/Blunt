@@ -8,3 +8,10 @@ light numbers using i < 9
 }
 
 println("Expected: 4, 6, 8, 10, 12, 14, 16, 18, 20, 10\nReal:", numbers);
+
+light numbers
+{
+    numbers.i = numbers.i * 2 + 1;
+}
+
+println("Expected: 9, 13, 17, 21, 25, 29, 33, 37, 41, 21\nReal:", numbers);

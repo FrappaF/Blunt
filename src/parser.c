@@ -707,14 +707,26 @@ AST_T *parser_parse_for_loop(parser_T *parser)
     ast_for->for_loop_variable = parser_parse_id(parser);
 
     LOG_PRINT("Parsing for loop iterator\n");
-    parser_eat(parser, TOKEN_FOR_ITERATOR);
-    char *token_name = parser->current_token->value;
-    AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
-    ast_variable->variable_name = token_name;
-    ast_for->for_loop_increment = (AST_T *)ast_variable;
+    // Check if the current token is a for iterator otherwise create a new variable
+    if (parser->current_token->type != TOKEN_FOR_ITERATOR)
+    {
+        LOG_PRINT("Creating for loop iterator\n");
+        char *iterator_name = "i";
+        AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+        ast_variable->variable_name = iterator_name;
+        ast_for->for_loop_increment = (AST_T *)ast_variable;
+    }
+    else
+    {
+        parser_eat(parser, TOKEN_FOR_ITERATOR);
+        char *token_name = parser->current_token->value;
+        AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+        ast_variable->variable_name = token_name;
+        ast_for->for_loop_increment = (AST_T *)ast_variable;
 
-    LOG_PRINT("Parsing for loop condition\n");
-    ast_for->for_loop_condition = parser_parse_expression(parser);
+        LOG_PRINT("Parsing for loop condition\n");
+        ast_for->for_loop_condition = parser_parse_expression(parser);
+    }
 
     LOG_PRINT("Parsing for loop body\n");
     parser_eat(parser, TOKEN_LBRACE);

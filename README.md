@@ -62,8 +62,8 @@ Using the `light` keyword it is possible to use a sort of for loop.
 ```(blunt)
 roll 10 values with [0,1,2,3,4,5,6,7,8,9];
 
-# Iterate using i as index var as long as i < 8
-light values [with idx < 8]
+# Iterate using idx as index var as long as i < 8
+light values [using idx < 8]
 {
   values.idx = values.(idx+1);
 }
@@ -71,7 +71,7 @@ light values [with idx < 8]
 # values = [1,2,3,4,5,6,7,8,9,9]
 ```
 
-It's not mandatory to indicate the iterator variable and the iteration condition `[with i < 8]`. If it's not specified the compiler will iinstantiate a default `i` iterator that keeps growing until it reaches the end of list, so that it is possible to write only:
+It's not mandatory to indicate the iterator variable and the iteration condition `[using i < 8]`. If it's not specified the compiler will iinstantiate a default `i` iterator that keeps growing until it reaches the end of list, so that it is possible to write only:
 
 ```(blunt)
 light values
