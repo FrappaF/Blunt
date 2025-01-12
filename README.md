@@ -1,149 +1,81 @@
-# **BLUNT**
+# BLUNT
 
-## Overview
+Yet another useless programming language, just for fun.
 
-MyLanguage is a simple programming language designed for educational purposes. It supports variable definitions, function definitions, function calls, and basic arithmetic expressions.
+# BASICS
 
-# **_Syntax_**
+Here some useless basics in order to use ( why? ) blunt for code.
 
-### Variable Definitions
+## Variables
 
-Variables can be defined using the roll keyword followed by the number of instances, the variable name, and the value. The with keyword is used to assign the value.
+Every variable could be managed as an array!
+The syntax for instantiate a new variable is the following:
 
-Example:
-
-```
-roll 1 joint with "sto tutto fatto";
-roll 1 puro with "madonna";
+```(blunt)
+roll [count] var_name with (=) 1;
 ```
 
-### Function Definitions
+Where `[count]` is an optional indicator for how many var_name you want to instantiate. This could be usefull for anything!
+Let's say I have declared 10 variables named snoopy ( `roll 10 snoopy with "HEY"` ) now I can access the i-th value of the i-th snoopy.
+Sounds great isn't it?
 
-Functions (referred to as "blunts") are defined using the blunt keyword followed by the function name and parameters. The function body is enclosed in curly braces {}.
+### Example
 
-Example:
+```(blunt)
+roll 10 snoopy with "HEY";
 
+# Builtin println useful for printing
+println(snoopy.3) # With the dot annotation I can access at the fourth snoopy value
 ```
-blunt smokeWeedEveryDay()
+
+In this snippet we've created 10 snoopy with the same value each. I can treat this variable as an array of values:
+`["HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY"]`
+
+**NOTE**: On runtime while snoopy values are the same it is represented with a single value. Only when a particular variable value changes it is converted in a real array. I.e. `snoopy.1 = "YAY";` converts the var snoopy in an array prepresented as: `["HEY", "YAY", "HEY" x8]`
+
+## Functions
+
+The functions here are called **_blunts_**. The syntax is C like:
+
+```(blunt)
+# Definition of a new blunt
+blunt func_name(var1, var2, ...)
 {
-roll weed with 19;
-print("SMOKE WEED EVERY DAY!!!\n");
+  # Body of the function
+
+  # Insead of returning a result we smoke that
+  smoke result;
 }
 ```
 
-### Function Calls
+There is not yet any particular feature on that...
 
-Functions are called by their name followed by parentheses (). Arguments can be passed within the parentheses.
+## Loops
 
-Example:
+At the moment exists only one way to iterate over a loop. It is possible to iterate only through a variable (don't know why).
+Using the `light` keyword it is possible to use a sort of for loop.
 
-```
-smokeWeedEveryDay();
-```
+**_Keep in mind that it is not possible to ligh something witouth rolling something before_**
 
-### Return Statements
+### Example
 
-Functions can return values using the smoke keyword followed by the value to be returned.
+```(blunt)
+roll 10 values with [0,1,2,3,4,5,6,7,8,9];
 
-Example:
-
-```
-blunt returnAString()
+# Iterate using i as index var as long as i < 8
+light values [with idx < 8]
 {
-roll returnValue with "This should be the last line printed\n";
-smoke returnValue;
-}
-```
-
-## Built-in Functions
-
-- **print**: Prints the provided arguments to the console.
-
-Example:
-
-```
-print(joint, puro, "\n");
-```
-
-### Arithmetic Expressions
-
-MyLanguage supports basic arithmetic operations such as addition +, subtraction -, multiplication \*, and division /. Parentheses () can be used to group expressions.
-
-Example:
-
-```
-roll 1 result1 with 31 + 27 * (33-1);
-```
-
-# _First interaction with the language_
-
-## Variable definitions
-
-```
-roll 1 joint with "sto tutto fatto";
-roll 1 puro with "madonna";
-```
-
-## Function call
-
-```
-print(joint, puro, "\n");Functions and Scopes
-```
-
-## Functions (/ blunts) definition and scopes tests
-
-```
-roll 1 globalVar with "This is a global var";blunt smokeWeedEveryDay()
-{
-roll weed with 19;
-print("SMOKE WEED EVERY DAY!!!\n");
-}
-```
-
-## Blunts with arguments
-
-```
-blunt printTheString(theString)
-{
-  print(theString);
+  values.idx = values.(idx+1);
 }
 
-blunt printTwoString(string1, string2)
+# values = [1,2,3,4,5,6,7,8,9,9]
+```
+
+It's not mandatory to indicate the iterator variable and the iteration condition `[with i < 8]`. If it's not specified the compiler will iinstantiate a default `i` iterator that keeps growing until it reaches the end of list, so that it is possible to write only:
+
+```(blunt)
+light values
 {
-  printTheString(string1);
-  printTheString(string2);
+  values.i = values.i * 2;
 }
-```
-
-## Blunts with return (smoked) value
-
-```
-# Classic fibonacci calculation
-
-blunt fib(n)
-{
-    if(n == 1) {
-        smoke 1;
-    }
-    if(n  == 0)
-    {
-        smoke 0;
-    }
-
-    smoke fib(n-1) + fib(n-2)
-}
-
-println("Fib(20):", fib(20))
-```
-
-## Expressions evaluation tests
-
-```
-roll 1 result1 with 31 + 27 \* (33-1);
-
-print("result1 is :", result1, "\n");
-
-roll result2 with (42 + result1) - (123*44-2*2) / 4;
-
-print("result 2 is:", result2, "\n");
 ```
