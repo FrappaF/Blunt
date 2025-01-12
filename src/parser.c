@@ -121,6 +121,9 @@ AST_T *parser_parse_statement(parser_T *parser)
     case TOKEN_IF:
         LOG_PRINT("Parsing ifelse branch\n");
         return parser_parse_ifelse_statement(parser);
+    case TOKEN_FOR:
+        LOG_PRINT("Parsing for loop\n");
+        return parser_parse_for_loop(parser);
     case TOKEN_EOF:
         return NULL;
     default:
@@ -612,7 +615,7 @@ AST_T *parser_parse_dot_expression(parser_T *parser)
 
     char *dot_index_chars = parser->current_token->value;
 
-    AST_T *ast_dot_expression = parser_parse_expression(parser);
+    AST_T *ast_dot_expression = parser_parse_expression_with_precedence(parser, 20);
 
     AST_DOT_EXPRESSION_T *ast_dot_expression_node = (AST_DOT_EXPRESSION_T *)init_ast(AST_DOT_EXPRESSION);
     ast_dot_expression_node->dot_expression_variable_name = variable_name;
@@ -691,6 +694,48 @@ AST_T *parser_parse_array(parser_T *parser)
     parser_eat(parser, TOKEN_RSQUARE);
 
     return (AST_T *)ast_array;
+}
+
+AST_T *parser_parse_for_loop(parser_T *parser)
+{
+    LOG_PRINT("Parsing for loop\n");
+    parser_eat(parser, TOKEN_FOR);
+
+    AST_FOR_LOOP_T *ast_for = (AST_FOR_LOOP_T *)init_ast(AST_FOR_LOOP);
+
+    LOG_PRINT("Parsing for loop variable\n");
+    ast_for->for_loop_variable = parser_parse_id(parser);
+
+    LOG_PRINT("Parsing for loop iterator\n");
+    // Check if the current token is a for iterator otherwise create a new variable
+    if (parser->current_token->type != TOKEN_FOR_ITERATOR)
+    {
+        LOG_PRINT("Creating for loop iterator\n");
+        char *iterator_name = "i";
+        AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+        ast_variable->variable_name = iterator_name;
+        ast_for->for_loop_increment = (AST_T *)ast_variable;
+    }
+    else
+    {
+        parser_eat(parser, TOKEN_FOR_ITERATOR);
+        char *token_name = parser->current_token->value;
+        AST_VARIABLE_T *ast_variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+        ast_variable->variable_name = token_name;
+        ast_for->for_loop_increment = (AST_T *)ast_variable;
+
+        LOG_PRINT("Parsing for loop condition\n");
+        ast_for->for_loop_condition = parser_parse_expression(parser);
+    }
+
+    LOG_PRINT("Parsing for loop body\n");
+    parser_eat(parser, TOKEN_LBRACE);
+
+    ast_for->for_loop_body = parser_parse_statements(parser);
+
+    parser_eat(parser, TOKEN_RBRACE);
+
+    return (AST_T *)ast_for;
 }
 
 AST_T *parser_parse_int(parser_T *parser)

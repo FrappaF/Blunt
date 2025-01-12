@@ -96,6 +96,12 @@
 // Token type for the dot '.'
 #define TOKEN_DOT 32
 
+// Token type for the for keyword
+#define TOKEN_FOR 33
+
+// Token type for the iterator keyword
+#define TOKEN_FOR_ITERATOR 34
+
 // variable definition identifier
 #define ID_DEF_VAR "roll"
 
@@ -128,5 +134,11 @@
 
 // Not identifier
 #define ID_NOT "not"
+
+// For loop identifier
+#define ID_FOR "light"
+
+// For loop iterator identifier
+#define ID_FOR_ITERATOR "using"
 
 #endif

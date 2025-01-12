@@ -33,6 +33,22 @@ lexer_token_map_T token_map[] = {
     {'\0', 0} // End of map marker
 };
 
+lexer_id_map_T id_map[] = {
+    {ID_DEF_VAR, TOKEN_VARIABLE_DEFINITION},
+    {ID_RETURN, TOKEN_RETURN},
+    {ID_FUNCTION_DEFINITION, TOKEN_FUNCTION_DEFINITION},
+    {ID_ASSIGNMENT, TOKEN_EQUALS},
+    {ID_IF, TOKEN_IF},
+    {ID_ELSEIF, TOKEN_ELSEIF},
+    {ID_ELSE, TOKEN_ELSE},
+    {ID_AND, TOKEN_AND},
+    {ID_OR, TOKEN_OR},
+    {ID_NOT, TOKEN_NOT},
+    {ID_FOR, TOKEN_FOR},
+    {ID_FOR_ITERATOR, TOKEN_FOR_ITERATOR},
+    {"\0", 0} // End of map marker
+};
+
 const char *token_type_to_string(int type)
 {
     switch (type)
@@ -101,6 +117,8 @@ const char *token_type_to_string(int type)
         return "TOKEN_RSQUARE";
     case TOKEN_DOT:
         return "TOKEN_DOT";
+    case TOKEN_FOR:
+        return "TOKEN_FOR";
     default:
         LOG_PRINT("Unknown token type: %d\n", type);
         return "TOKEN_UNKNOWN";

@@ -61,6 +61,12 @@ token_T *lexer_get_next_token(lexer_T *lexer)
         lexer_skip_comment(lexer);
         lexer_skip_whitespace(lexer);
 
+        // Check the end of file
+        if (lexer->c == '\0')
+        {
+            return init_token(TOKEN_EOF, "\0");
+        }
+
         if (isalnum(lexer->c))
         {
             token_T *id_token = lexer_collect_id(lexer);
@@ -71,46 +77,56 @@ token_T *lexer_get_next_token(lexer_T *lexer)
                 return id_token;
             }
 
-            if (strcmp(id_token->value, ID_DEF_VAR) == 0)
+            for (int i = 0; strcmp(id_map[i].id_name, "\0") != 0; i++)
             {
-                id_token->type = TOKEN_VARIABLE_DEFINITION;
+                if (strcmp(id_token->value, id_map[i].id_name) == 0)
+                {
+                    id_token->type = id_map[i].token_type;
+                    return id_token;
+                }
             }
-            else if (strcmp(id_token->value, ID_RETURN) == 0)
-            {
-                id_token->type = TOKEN_RETURN;
-            }
-            else if (strcmp(id_token->value, ID_FUNCTION_DEFINITION) == 0)
-            {
-                id_token->type = TOKEN_FUNCTION_DEFINITION;
-            }
-            else if (strcmp(id_token->value, ID_ASSIGNMENT) == 0)
-            {
-                id_token->type = TOKEN_EQUALS;
-            }
-            else if (strcmp(id_token->value, ID_IF) == 0)
-            {
-                id_token->type = TOKEN_IF;
-            }
-            else if (strcmp(id_token->value, ID_ELSEIF) == 0)
-            {
-                id_token->type = TOKEN_ELSEIF;
-            }
-            else if (strcmp(id_token->value, ID_ELSE) == 0)
-            {
-                id_token->type = TOKEN_ELSE;
-            }
-            else if (strcmp(id_token->value, ID_AND) == 0)
-            {
-                id_token->type = TOKEN_AND;
-            }
-            else if (strcmp(id_token->value, ID_OR) == 0)
-            {
-                id_token->type = TOKEN_OR;
-            }
-            else if (strcmp(id_token->value, ID_NOT) == 0)
-            {
-                id_token->type = TOKEN_NOT;
-            }
+
+            // if (strcmp(id_token->value, ID_DEF_VAR) == 0)
+            // {
+            //     id_token->type = TOKEN_VARIABLE_DEFINITION;
+            // }
+            // else if (strcmp(id_token->value, ID_RETURN) == 0)
+            // {
+            //     id_token->type = TOKEN_RETURN;
+            // }
+            // else if (strcmp(id_token->value, ID_FUNCTION_DEFINITION) == 0)
+            // {
+            //     id_token->type = TOKEN_FUNCTION_DEFINITION;
+            // }
+            // else if (strcmp(id_token->value, ID_ASSIGNMENT) == 0)
+            // {
+            //     id_token->type = TOKEN_EQUALS;
+            // }
+            // else if (strcmp(id_token->value, ID_IF) == 0)
+            // {
+            //     id_token->type = TOKEN_IF;
+            // }
+            // else if (strcmp(id_token->value, ID_ELSEIF) == 0)
+            // {
+            //     id_token->type = TOKEN_ELSEIF;
+            // }
+            // else if (strcmp(id_token->value, ID_ELSE) == 0)
+            // {
+            //     id_token->type = TOKEN_ELSE;
+            // }
+            // else if (strcmp(id_token->value, ID_AND) == 0)
+            // {
+            //     id_token->type = TOKEN_AND;
+            // }
+            // else if (strcmp(id_token->value, ID_OR) == 0)
+            // {
+            //     id_token->type = TOKEN_OR;
+            // }
+            // else if (strcmp(id_token->value, ID_NOT) == 0)
+            // {
+            //     id_token->type = TOKEN_NOT;
+            // }
+
             return id_token;
         }
         else if (lexer->c == '"' || lexer->c == '\'')
@@ -155,12 +171,12 @@ token_T *lexer_get_next_token(lexer_T *lexer)
             }
         }
 
-        LOG_PRINT("Unexpected character: %c\n", lexer->c);
+        LOG_PRINT("Unexpected character: %c (%d)\n", lexer->c, lexer->c);
         exit(1);
     }
 
     if (lexer->i == strlen(lexer->contents) - 1)
-        return lexer_advance_with_token(lexer, init_token(TOKEN_EOF, ""));
+        return lexer_advance_with_token(lexer, init_token(TOKEN_EOF, "\0"));
 
     return NULL;
 }

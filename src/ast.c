@@ -102,6 +102,9 @@ size_t ast_get_size(AST_T *ast)
     case AST_VARIABLE_ASSIGNMENT:
         size = sizeof(AST_VARIABLE_ASSIGNMENT_T);
         break;
+    case AST_FOR_LOOP:
+        size = sizeof(AST_FOR_LOOP_T);
+        break;
     default:
         size = sizeof(AST_T);
         break;
@@ -346,6 +349,16 @@ AST_T *init_ast(int type)
         variable_count_node->variable_count_value = 0;
         return (AST_T *)variable_count_node;
     }
+    case AST_FOR_LOOP:
+    {
+        AST_FOR_LOOP_T *for_loop_node = calloc(1, sizeof(struct AST_FOR_LOOP_STRUCT));
+        for_loop_node->base = *ast;
+        for_loop_node->for_loop_increment = NULL;
+        for_loop_node->for_loop_condition = NULL;
+        for_loop_node->for_loop_variable = NULL;
+        for_loop_node->for_loop_body = NULL;
+        return (AST_T *)for_loop_node;
+    }
     case AST_NOOP:
     {
         return ast;
@@ -417,6 +430,8 @@ const char *ast_type_to_string(int type)
         return "AST_VARIABLE_ASSIGNMENT";
     case AST_DOT_EXPRESSION:
         return "AST_DOT_EXPRESSION";
+    case AST_FOR_LOOP:
+        return "AST_FOR_LOOP";
     case AST_NOOP:
         return "AST_NOOP";
     default:
@@ -520,6 +535,12 @@ void ast_print(AST_T *node, int indent)
         print_indent(indent + 1);
         LOG_PRINT("Name: %s\n", ((AST_DOT_EXPRESSION_T *)node)->dot_expression_variable_name);
         ast_print(((AST_DOT_EXPRESSION_T *)node)->dot_index, indent + 1);
+        break;
+    case AST_FOR_LOOP:
+        ast_print(((AST_FOR_LOOP_T *)node)->for_loop_variable, indent + 1);
+        ast_print(((AST_FOR_LOOP_T *)node)->for_loop_condition, indent + 1);
+        ast_print(((AST_FOR_LOOP_T *)node)->for_loop_increment, indent + 1);
+        ast_print(((AST_FOR_LOOP_T *)node)->for_loop_body, indent + 1);
         break;
     default:
         break;

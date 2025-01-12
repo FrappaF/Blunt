@@ -131,3 +131,85 @@ print("result1 is :", result1, "\n");
 roll result2 with (42 + result1) - (123*44-2*2) / 4;
 
 print("result 2 is:", result2, "\n");
+
+If/Else Evaluation
+# If/Else evaluation tests
+
+blunt test(x, y)
+{
+    if(x > y)
+    {
+        smoke x;
+    }
+    elseif(x < y) {
+        smoke y;
+    } 
+    else {
+        smoke x;
+    }
+}
+
+roll res with test(10, 11);
+print("The biggest number between 10 and 11 is", res);
+
+blunt areEquals(x, y)
+{
+    if(x == y)
+    {
+        smoke 1;
+    }
+    smoke 0;
+}
+
+roll resEq with areEquals(10, 10);
+print("10 == 10?", resEq);
+
+blunt complexTest(a, b, c)
+{
+    if(a > b and a > c)
+    {
+        smoke a;
+    }
+    elseif(b > a and b > c) {
+        smoke b;
+    } 
+    elseif(not(a > b and a > c)) {
+        smoke c;
+    }
+    else {
+        smoke a + b + c;
+    }
+}
+
+roll res1 with complexTest(5, 10, 15);
+print("Expected: 15, Actual:", res1);
+
+roll res2 with complexTest(20, 10, 5);
+print("Expected: 20, Actual:", res2);
+
+roll res3 with complexTest(10, 20, 10);
+print("Expected: 20, Actual:", res3);
+
+roll res4 with complexTest(10, 10, 10);
+print("Expected: 10, Actual:", res4);
+
+Variable with Multiple Values
+# Variable with multiple value tests
+
+roll single with "Weed";
+print("Expected single value: \"Weed\"\nReal value:", single);
+
+single = 10;
+print("Expected new variable value: 10\nReal value:", single);
+
+roll 3 multiple with [1, 2, 3];
+
+single = multiple.0;
+print("Expected first value: 1\nReal value:", single);
+
+roll index with 1;
+multiple.index = 5;
+print("Array [1, 5, 3]:", multiple);
+
+roll 3 same with 1;
+print("Same multiple values [1, 1, 1]:", same.0, same.1, same.2);
