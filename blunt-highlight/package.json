@@ -1,0 +1,33 @@
+{
+  "name": "blunt",
+  "displayName": "blunt",
+  "description": "blunts",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "blunt",
+      "aliases": ["Blunt", "blunt"],
+      "extensions": [".blunt"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "blunt",
+      "scopeName": "source.blunt",
+      "path": "./syntaxes/blunt.tmLanguage.json"
+    }],
+    "iconThemes": [
+      {
+        "id": "blunt-icons",
+        "label": "Blunt File Icons",
+        "path": "./file-icon-theme.json"
+      }
+    ]
+  
+  }
+}

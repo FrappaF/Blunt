@@ -1,0 +1,83 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Blunt",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#bultinfunctions"
+		},
+		{
+			"name": "constant.numeric.blunt",
+			"match": "\\b\\d+\\b"
+		},
+		{
+			"include": "#function-call"
+		},
+		{
+			"include": "#variables"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.blunt",
+				"match": "\\b(if|elseif|else|roll|using|smoke|with|blunt|light)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.blunt",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.blunt",
+					"match": "\\\\."
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.number-sign.blunt",
+					"begin": "#",
+					"end": "$"
+				}
+			]
+		},
+		"bultinfunctions": {
+			"patterns": [
+				{
+					"name": "support.function.blunt",
+					"match": "\\b(print|println|free)\\b"
+
+					
+				}
+			]
+		},
+		"function-call": {
+			"patterns": [
+				{
+					"name": "entity.name.function.blunt",
+					"match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\s*\\("
+				}
+			]
+		},
+		"variables": {
+			"patterns": [
+				{
+					"name": "variable.other.blunt",
+					"match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+				}
+			]
+		}
+	},
+	"scopeName": "source.blunt"
+}

@@ -79,3 +79,7 @@ light values
   values.i = values.i * 2;
 }
 ```
+
+## Syntax Highlight
+
+In the `blunt-highlight` folder there is the extension for supporting `blunt`syntax highlight in VSCode. It can be installed by copying this folder into `.vscode/extensions` folder and refresh vscode
