@@ -7,4 +7,4 @@ light numbers using i < 9
     numbers.i = numbers.i * 2;
 }
 
-println(numbers);
+println("Expected: 4, 6, 8, 10, 12, 14, 16, 18, 20, 10\nReal:", numbers);
