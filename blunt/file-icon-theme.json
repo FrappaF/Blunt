@@ -1,0 +1,16 @@
+{
+    "iconDefinitions": {
+      "bluntFile": {
+        "iconPath": "./icons/blunt-icon-file.svg"
+      }
+    },
+    "fileExtensions": {
+      "blunt": "bluntFile"
+    },
+    "fileNames": {
+      ".bluntrc": "bluntFile"
+    },
+    "folderNames": {},
+    "folderNamesExpanded": {}
+  }
+  
