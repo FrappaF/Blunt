@@ -1,0 +1,54 @@
+# Test blunts as mix of classes and functions
+
+blunt classJoint(ingredients, helloString) 
+{
+    # Every code in the class scope is part of the constructor
+
+    keep ingredients; # Save the ingredients in the blunt
+
+    blunt getIngredients()
+    {
+        smoke ingredients;
+    }
+
+    blunt setIngredients(ingredients)
+    {
+        this.ingredients = ingredients;
+    }
+
+    blunt rollIngredients()
+    {
+        light ingredients 
+        {
+            println("Rolling", ingredients.i);
+        }
+    }
+
+    blunt printIngredients()
+    {
+        # the helloString is not saved so it can't be used outside the constructor
+        println(helloString);
+        println("Ingredients:", ingredients);
+    }
+
+    # Also this line is executed in the constructor
+    printIngredients();
+}
+
+
+roll ingredients with ["tobacco", "paper", "filter"];
+
+roll obj with classJoint(ingredients);
+
+# funtcion definition -> visit_blunt_function_definition + push in the funcion scope the blunt "save" variables.
+# if function call 
+# loop func def body
+# if compund node is func def and the name is the same as the function call
+# -> push all the blunt variables in the new function scope
+# -> visitor visit funtion
+# -> pop the function scope
+
+obj.rollIngredients();
+
+println("Ingredients: ", obj.getIngredients());
+

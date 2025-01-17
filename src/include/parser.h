@@ -200,4 +200,11 @@ AST_T *parser_parse_factor_with_precedence(parser_T *parser, int precedence);
  */
 AST_T *parser_parse_for_loop(parser_T *parser);
 
+/**
+ * Parses a save expression.
+ * @param parser The parser instance.
+ * @return The parsed AST node representing the nested expression.
+ */
+AST_T *parser_parse_save_statement(parser_T *parser);
+
 #endif // PARSE_H

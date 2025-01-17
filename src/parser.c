@@ -124,6 +124,9 @@ AST_T *parser_parse_statement(parser_T *parser)
     case TOKEN_FOR:
         LOG_PRINT("Parsing for loop\n");
         return parser_parse_for_loop(parser);
+    case TOKEN_SAVE:
+        LOG_PRINT("Parsing save\n");
+        return parser_parse_save_statement(parser);
     case TOKEN_EOF:
         return NULL;
     default:
@@ -736,6 +739,17 @@ AST_T *parser_parse_for_loop(parser_T *parser)
     parser_eat(parser, TOKEN_RBRACE);
 
     return (AST_T *)ast_for;
+}
+
+AST_T *parser_parse_save_statement(parser_T *parser)
+{
+    LOG_PRINT("Parsing save\n");
+    parser_eat(parser, TOKEN_SAVE);
+
+    AST_SAVE_T *ast_save = (AST_SAVE_T *)init_ast(AST_SAVE);
+    ast_save->save_value = (AST_VARIABLE_T *)parser_parse_id(parser);
+
+    return (AST_T *)ast_save;
 }
 
 AST_T *parser_parse_int(parser_T *parser)
