@@ -559,6 +559,9 @@ void ast_print(AST_T *node, int indent)
         ast_print(((AST_FOR_LOOP_T *)node)->for_loop_increment, indent + 1);
         ast_print(((AST_FOR_LOOP_T *)node)->for_loop_body, indent + 1);
         break;
+    case AST_SAVE:
+        ast_print(((AST_SAVE_T *)node)->save_value, indent + 1);
+        break;
     default:
         break;
     }
