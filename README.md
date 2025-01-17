@@ -7,8 +7,10 @@ Yet another useless programming language, just for fun.
   - [Variables](#variables)
     - [Example](#example)
   - [Functions](#functions)
-  - [Loops](#loops)
     - [Example](#example-1)
+      - [Example](#example-2)
+  - [Loops](#loops)
+    - [Example](#example-3)
   - [Syntax Highlight](#syntax-highlight)
 
 
@@ -60,6 +62,8 @@ blunt func_name(var1, var2, ...)
 
 A **_blunt_** is a mix between a class and a method. It can hold both variable and blunts definitions in it. When a blunt is called, if no return value is specified, it returns itself. In this way it is possible to access the methods defined within it.
 
+### Example
+
 ```(blunt)
 blunt classBlunt(initValue)
 {
@@ -84,7 +88,30 @@ instance.printValue();
 # "hello" 
 ```
 
+It is also possible to define blunt classes inside a blunt. (Whoa!)
+#### Example
 
+```(blunt)
+blunt class(initValue)
+{
+  keep initValue;
+
+  blunt nestedClass(hiString)
+  {
+    keep hiString;
+
+    blunt sayHi()
+    {
+      println(hiString);
+    }
+  }
+}
+
+smoke obj with class(10);
+smoke nestedObj with obj.nestedClass("Hello mfs!");
+nestedObj.sayHi();
+# Hello mfs!
+```
 
 ## Loops
 

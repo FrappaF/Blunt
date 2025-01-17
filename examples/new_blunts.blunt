@@ -59,6 +59,6 @@ obj.setIngredients(ingredients);
 
 obj.rollIngredients();
 
-roll nestedObj with obj.nestedClass("Hi there");
+roll nestedObj with obj.nestedClass("Smoked everything");
 nestedObj.sayHi();
 
