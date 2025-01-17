@@ -1,0 +1,64 @@
+# Test blunts as mix of classes and functions
+
+blunt classJoint(ingredients, helloString) 
+{
+    # Every line in the class scope is part of the constructor
+
+    keep ingredients; # Save the ingredients in the blunt
+
+    blunt getIngredients()
+    {
+        smoke ingredients;
+    }
+
+    blunt setIngredients(ingred)
+    {
+        ingredients = ingred;
+    }
+
+    blunt rollIngredients()
+    {
+        light ingredients 
+        {
+            println("Rolling", ingredients.i);
+        }
+    }
+
+    blunt printIngredients()
+    {
+        # the helloString is not saved so it can't be used outside the constructor
+        println(helloString);
+        println("Ingredients:", ingredients);
+    }
+
+
+    blunt nestedClass(sayHiString)
+    {
+        keep sayHiString;
+
+        blunt sayHi()
+        {
+            println(sayHiString);
+        }
+    }
+
+    # Also this line is executed in the constructor
+    printIngredients();
+}
+
+
+roll 3 ingredients with ["tobacco", "paper", "filter"];
+
+roll obj with classJoint(ingredients, "Hello");
+
+obj.rollIngredients();
+
+# Change the ingredients
+ingredients.1 = "pink paper";
+obj.setIngredients(ingredients);
+
+obj.rollIngredients();
+
+roll nestedObj with obj.nestedClass("Smoked everything");
+nestedObj.sayHi();
+

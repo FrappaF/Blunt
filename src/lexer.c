@@ -86,47 +86,6 @@ token_T *lexer_get_next_token(lexer_T *lexer)
                 }
             }
 
-            // if (strcmp(id_token->value, ID_DEF_VAR) == 0)
-            // {
-            //     id_token->type = TOKEN_VARIABLE_DEFINITION;
-            // }
-            // else if (strcmp(id_token->value, ID_RETURN) == 0)
-            // {
-            //     id_token->type = TOKEN_RETURN;
-            // }
-            // else if (strcmp(id_token->value, ID_FUNCTION_DEFINITION) == 0)
-            // {
-            //     id_token->type = TOKEN_FUNCTION_DEFINITION;
-            // }
-            // else if (strcmp(id_token->value, ID_ASSIGNMENT) == 0)
-            // {
-            //     id_token->type = TOKEN_EQUALS;
-            // }
-            // else if (strcmp(id_token->value, ID_IF) == 0)
-            // {
-            //     id_token->type = TOKEN_IF;
-            // }
-            // else if (strcmp(id_token->value, ID_ELSEIF) == 0)
-            // {
-            //     id_token->type = TOKEN_ELSEIF;
-            // }
-            // else if (strcmp(id_token->value, ID_ELSE) == 0)
-            // {
-            //     id_token->type = TOKEN_ELSE;
-            // }
-            // else if (strcmp(id_token->value, ID_AND) == 0)
-            // {
-            //     id_token->type = TOKEN_AND;
-            // }
-            // else if (strcmp(id_token->value, ID_OR) == 0)
-            // {
-            //     id_token->type = TOKEN_OR;
-            // }
-            // else if (strcmp(id_token->value, ID_NOT) == 0)
-            // {
-            //     id_token->type = TOKEN_NOT;
-            // }
-
             return id_token;
         }
         else if (lexer->c == '"' || lexer->c == '\'')

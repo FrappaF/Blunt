@@ -9,7 +9,7 @@ typedef struct VISITOR_STRUCT
 {
     scope_T *global_scope;
     scope_stack_T *scope_stack;
-
+    AST_FUNCTION_DEFINITION_T *current_function;
 } visitor_T;
 
 /**
@@ -155,6 +155,39 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
  * @return The result of the visit.
  */
 AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node);
+
+/**
+ * Visits a save node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the save.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_save(visitor_T *visitor, AST_SAVE_T *node);
+
+/**
+ * Visits a term node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the term.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node);
+
+/**
+ * Visits a factor node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the factor.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node);
+
+/**
+ * Visits a function call from a definition node in the AST.
+ * @param visitor The visitor.
+ * @param function_definition The AST node representing the function definition.
+ * @param function_call The AST node representing the function call.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call);
 
 /**
  * Get a variable definition from the visitor.

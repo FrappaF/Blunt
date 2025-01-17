@@ -102,6 +102,9 @@
 // Token type for the iterator keyword
 #define TOKEN_FOR_ITERATOR 34
 
+// Token type for the save keyword
+#define TOKEN_SAVE 35
+
 // variable definition identifier
 #define ID_DEF_VAR "roll"
 
@@ -140,5 +143,8 @@
 
 // For loop iterator identifier
 #define ID_FOR_ITERATOR "using"
+
+// Save identifier
+#define ID_SAVE "keep"
 
 #endif
