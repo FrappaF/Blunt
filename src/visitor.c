@@ -12,6 +12,8 @@ static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t argume
 void visitor_add_function_definition(visitor_T *visitor, AST_T *node);
 void visitor_add_variable_definition(visitor_T *visitor, AST_T *node);
 
+int visitor_get_variable_count(visitor_T *visitor, AST_VARIABLE_T *node);
+
 // Function definitions
 visitor_T *init_visitor()
 {
@@ -154,7 +156,7 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
         }
 
         AST_FUNCTION_DEFINITION_T *function_definition = (AST_FUNCTION_DEFINITION_T *)(variable_definition->variable_definition_value);
-
+        LOG_PRINT("Function definition variable size: %lu\n", function_definition->function_definition_variables_size);
         AST_FUNCTION_CALL_T *function_call = (AST_FUNCTION_CALL_T *)node->dot_index;
 
         return visitor_visit_function_call_from_definition(visitor, function_definition, function_call);
@@ -238,11 +240,12 @@ AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCT
     visitor_add_function_definition(visitor, (AST_T *)call_definition);
 
     // Add function variables to new scope stack
-    LOG_PRINT("Adding function variables to scope (length: %d)\n", call_definition->function_definition_variables_size);
-    for (size_t i = 0; i < call_definition->function_definition_variables_size; i++)
+    LOG_PRINT("Adding function variables to scope (length: %lu)\n", function_definition->function_definition_variables_size);
+    for (size_t i = 0; i < function_definition->function_definition_variables_size; i++)
     {
-        LOG_PRINT("Adding function variable %s to scope\n", ((AST_VARIABLE_DEFINITION_T *)(call_definition->function_definition_variables[i]))->variable_definition_variable_name);
-        visitor_add_variable_definition(visitor, (AST_T *)call_definition->function_definition_variables[i]);
+        AST_VARIABLE_DEFINITION_T *variable_definition = function_definition->function_definition_variables[i];
+        LOG_PRINT("Adding function variable %s (count %d) to scope\n", variable_definition->variable_definition_variable_name, ((AST_VARIABLE_COUNT_T *)(variable_definition->variable_definition_variable_count))->variable_count_value);
+        visitor_add_variable_definition(visitor, (AST_T *)variable_definition);
     }
 
     AST_T *result = visitor_visit_function_call(visitor, function_call);
@@ -273,7 +276,7 @@ AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_FUNCTION_DEFINI
     for (size_t i = 0; i < node->function_definition_arguments_size; i++)
     {
 
-        AST_VARIABLE_DEFINITION_T *argument = node->function_definition_arguments[i];
+        AST_VARIABLE_T *argument = node->function_definition_arguments[i];
         if (!argument)
         {
             log_error("Function definition argument %lu is NULL\n", i);
@@ -282,13 +285,13 @@ AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_FUNCTION_DEFINI
 
         LOG_PRINT("Function argument %lu [%s]\n", i, ast_type_to_string(argument->base.type));
 
-        if (!argument->variable_definition_variable_name)
+        if (!argument->variable_name)
         {
             log_error("Function definition argument name is NULL\n");
             exit(1);
         }
 
-        LOG_PRINT("Function argument %lu: %s\n", i, argument->variable_definition_variable_name);
+        LOG_PRINT("Function argument %lu: %s\n", i, argument->variable_name);
     }
 
     visitor_add_function_definition(visitor, (AST_T *)node);
@@ -606,7 +609,7 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
             visitor->current_function = function_definition;
 
             size_t arguments_size = function_definition->function_definition_arguments_size;
-            AST_T **arguments = calloc(arguments_size, sizeof(struct AST_VARIABLE_DEFINITION_T *));
+            AST_T **arguments = calloc(arguments_size, sizeof(struct AST_VARIABLE_T *));
 
             for (size_t i = 0; i < arguments_size; i++)
             {
@@ -617,27 +620,36 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
                     exit(1);
                 }
 
-                AST_VARIABLE_DEFINITION_T *original_argument = function_definition->function_definition_arguments[i];
+                AST_VARIABLE_T *original_argument = function_definition->function_definition_arguments[i];
 
                 if (i >= node->function_call_arguments_size)
                 {
                     log_error("Not enough arguments provided for function '%s' expected argument '%s'\n",
                               node->function_call_name,
-                              original_argument->variable_definition_variable_name);
+                              original_argument->variable_name);
                     exit(1);
                 }
 
                 LOG_PRINT("Passed argument type: %s\n", ast_type_to_string(node->function_call_arguments[i]->type));
 
-                argument_copy->variable_definition_variable_name = strdup(original_argument->variable_definition_variable_name);
+                argument_copy->variable_definition_variable_name = strdup(original_argument->variable_name);
                 argument_copy->variable_definition_value = visitor_visit(visitor, node->function_call_arguments[i]);
-                argument_copy->variable_definition_variable_count = original_argument->variable_definition_variable_count;
+                argument_copy->variable_definition_variable_count = (AST_VARIABLE_COUNT_T *)init_ast(AST_VARIABLE_COUNT);
+                ((AST_VARIABLE_COUNT_T *)(argument_copy->variable_definition_variable_count))->variable_count_value = 1;
+
+                // Check if function call argument is a variable
+                if (node->function_call_arguments[i]->type == AST_VARIABLE)
+                {
+                    int count = visitor_get_variable_count(visitor, (AST_VARIABLE_T *)node->function_call_arguments[i]);
+                    ((AST_VARIABLE_COUNT_T *)(argument_copy->variable_definition_variable_count))->variable_count_value = count;
+                }
 
                 arguments[i] = argument_copy;
 
-                LOG_PRINT("Adding argument %s [%s]\n",
+                LOG_PRINT("Adding argument %s [%s] (count: %lu)\n",
                           argument_copy->variable_definition_variable_name,
-                          ast_type_to_string(argument_copy->variable_definition_value->type));
+                          ast_type_to_string(argument_copy->variable_definition_value->type),
+                          ((AST_VARIABLE_COUNT_T *)(argument_copy->variable_definition_variable_count))->variable_count_value);
             }
 
             visitor->scope_stack = push_scope_to_stack(visitor->scope_stack, init_scope());
@@ -646,6 +658,9 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
             {
                 LOG_PRINT("Adding argument to scope: %s\n",
                           ((AST_VARIABLE_DEFINITION_T *)arguments[i])->variable_definition_variable_name);
+
+                LOG_PRINT("Argument count: %lu\n",
+                          ((AST_VARIABLE_COUNT_T *)(((AST_VARIABLE_DEFINITION_T *)arguments[i])->variable_definition_variable_count))->variable_count_value);
 
                 visitor_add_variable_definition(visitor, ((AST_VARIABLE_DEFINITION_T *)arguments[i]));
             }
@@ -1018,11 +1033,14 @@ AST_T *visitor_visit_save(visitor_T *visitor, AST_SAVE_T *node)
     // Get the value of the variable
     AST_T *variable_value = variable_definition->variable_definition_value;
 
+    LOG_PRINT("Variable value type: %s\n", ast_type_to_string(variable_value->type));
+    AST_VARIABLE_COUNT_T *variable_count = (AST_VARIABLE_COUNT_T *)variable_definition->variable_definition_variable_count;
     // Create a new variable definition
     AST_VARIABLE_DEFINITION_T *save_variable_definition = (AST_VARIABLE_DEFINITION_T *)init_ast(AST_VARIABLE_DEFINITION);
     save_variable_definition->variable_definition_variable_name = save_variable->variable_name;
     save_variable_definition->variable_definition_value = variable_value;
-    save_variable_definition->variable_definition_variable_count = variable_definition->variable_definition_variable_count;
+    LOG_PRINT("variable count: %lu\n", variable_count->variable_count_value);
+    save_variable_definition->variable_definition_variable_count = (AST_VARIABLE_COUNT_T *)variable_definition->variable_definition_variable_count;
 
     LOG_PRINT("Adding variable definition for %s (%s) to function definition\n", save_variable->variable_name, ast_type_to_string(variable_value->type));
     // Add the variable to the function definition variables
@@ -1035,6 +1053,20 @@ AST_T *visitor_visit_save(visitor_T *visitor, AST_SAVE_T *node)
     visitor->current_function->function_definition_variables[visitor->current_function->function_definition_variables_size - 1] = save_variable_definition;
 
     return init_ast(AST_NOOP);
+}
+
+int visitor_get_variable_count(visitor_T *visitor, AST_VARIABLE_T *node)
+{
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_name);
+    if (!variable_definition)
+    {
+        log_error("Variable '%s' not defined\n", node->variable_name);
+        exit(1);
+    }
+
+    AST_VARIABLE_COUNT_T *variable_count = (AST_VARIABLE_COUNT_T *)(variable_definition->variable_definition_variable_count);
+
+    return variable_count->variable_count_value;
 }
 
 void visitor_add_variable_definition(visitor_T *visitor, AST_T *node)

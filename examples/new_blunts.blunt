@@ -2,7 +2,7 @@
 
 blunt classJoint(ingredients, helloString) 
 {
-    # Every code in the class scope is part of the constructor
+    # Every line in the class scope is part of the constructor
 
     keep ingredients; # Save the ingredients in the blunt
 
@@ -31,6 +31,17 @@ blunt classJoint(ingredients, helloString)
         println("Ingredients:", ingredients);
     }
 
+
+    blunt nestedClass(sayHiString)
+    {
+        keep sayHiString;
+
+        blunt sayHi()
+        {
+            println(sayHiString);
+        }
+    }
+
     # Also this line is executed in the constructor
     printIngredients();
 }
@@ -40,21 +51,14 @@ roll 3 ingredients with ["tobacco", "paper", "filter"];
 
 roll obj with classJoint(ingredients, "Hello");
 
-# funtcion definition -> visit_blunt_function_definition + push in the funcion scope the blunt "save" variables.
-# if function call 
-# loop func def body
-# if compund node is func def and the name is the same as the function call
-# -> push all the blunt variables in the new function scope
-# -> visitor visit funtion
-# -> pop the function scope
-
 obj.rollIngredients();
 
-
-println("Ingredients: ", obj.getIngredients());
-
-ingredients.1 = "new tobacco";
+# Change the ingredients
+ingredients.1 = "pink paper";
 obj.setIngredients(ingredients);
 
 obj.rollIngredients();
+
+roll nestedObj with obj.nestedClass("Hi there");
+nestedObj.sayHi();
 

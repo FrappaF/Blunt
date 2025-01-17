@@ -115,7 +115,7 @@ typedef struct AST_FUNCTION_DEFINITION_STRUCT
     AST_T base;
     char *function_definition_name;
     struct AST_STRUCT *function_definition_body;
-    struct AST_VARIABLE_DEFINITION_T **function_definition_arguments;
+    struct AST_VARIABLE_T **function_definition_arguments;
     size_t function_definition_arguments_size;
 
     struct AST_VARIABLE_DEFINITION_T **function_definition_variables;

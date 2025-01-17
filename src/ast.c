@@ -469,7 +469,9 @@ void ast_print(AST_T *node, int indent)
     {
     case AST_VARIABLE_DEFINITION:
         print_indent(indent + 1);
+        AST_VARIABLE_DEFINITION_T *variable_definition = (AST_VARIABLE_DEFINITION_T *)node;
         LOG_PRINT("Name: %s\n", ((AST_VARIABLE_DEFINITION_T *)node)->variable_definition_variable_name);
+        LOG_PRINT("Count: %d\n", ((AST_VARIABLE_COUNT_T *)(variable_definition->variable_definition_variable_count))->variable_count_value);
         ast_print(((AST_VARIABLE_DEFINITION_T *)node)->variable_definition_value, indent + 1);
         break;
     case AST_VARIABLE:
@@ -478,10 +480,11 @@ void ast_print(AST_T *node, int indent)
         break;
     case AST_FUNCTION_DEFINITION:
         print_indent(indent + 1);
-        LOG_PRINT("Name: %s\n", ((AST_FUNCTION_DEFINITION_T *)node)->function_definition_name);
-        for (size_t i = 0; i < ((AST_FUNCTION_DEFINITION_T *)node)->function_definition_arguments_size; i++)
-            ast_print(((AST_FUNCTION_DEFINITION_T *)node)->function_definition_arguments[i], indent + 1);
-        ast_print(((AST_FUNCTION_DEFINITION_T *)node)->function_definition_body, indent + 1);
+        AST_FUNCTION_DEFINITION_T *function_definition = (AST_FUNCTION_DEFINITION_T *)node;
+        LOG_PRINT("Name: %s\n", function_definition->function_definition_name);
+        for (size_t i = 0; i < function_definition->function_definition_arguments_size; i++)
+            ast_print((AST_VARIABLE_DEFINITION_T *)(function_definition->function_definition_arguments[i]), indent + 1);
+        ast_print(function_definition->function_definition_body, indent + 1);
         break;
     case AST_FUNCTION_CALL:
         print_indent(indent + 1);

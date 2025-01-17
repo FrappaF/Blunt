@@ -2,6 +2,16 @@
 
 Yet another useless programming language, just for fun.
 
+- [BLUNT](#blunt)
+- [BASICS](#basics)
+  - [Variables](#variables)
+    - [Example](#example)
+  - [Functions](#functions)
+  - [Loops](#loops)
+    - [Example](#example-1)
+  - [Syntax Highlight](#syntax-highlight)
+
+
 # BASICS
 
 Here some useless basics in order to use ( why? ) blunt for code.
@@ -48,7 +58,33 @@ blunt func_name(var1, var2, ...)
 }
 ```
 
-There is not yet any particular feature on that...
+A **_blunt_** is a mix between a class and a method. It can hold both variable and blunts definitions in it. When a blunt is called, if no return value is specified, it returns itself. In this way it is possible to access the methods defined within it.
+
+```(blunt)
+blunt classBlunt(initValue)
+{
+  # Every line in the class scope is part of the constructor
+
+  keep initValue; # save initValue as a class attribute
+
+  blunt printValue()
+  {
+    println(initValue);
+  }
+
+  println("class initialized");
+
+}
+
+# instance will contain the classBlunt definition
+roll instance with classBlunt("hello");
+
+# Access the printValue method of classBlunt
+instance.printValue();
+# "hello" 
+```
+
+
 
 ## Loops
 
