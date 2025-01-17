@@ -29,7 +29,7 @@
 		"keywords": {
 			"patterns": [{
 				"name": "keyword.control.blunt",
-				"match": "\\b(if|elseif|else|roll|using|smoke|with|blunt|light)\\b"
+				"match": "\\b(if|elseif|else|roll|using|smoke|with|blunt|light|keep)\\b"
 			}]
 		},
 		"strings": {
