@@ -11,8 +11,6 @@ static void builtin_print(visitor_T *visitor, AST_T **arguments, size_t argument
 static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
 void visitor_add_function_definition(visitor_T *visitor, AST_T *node);
 void visitor_add_variable_definition(visitor_T *visitor, AST_T *node);
-AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node);
-AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node);
 
 // Function definitions
 visitor_T *init_visitor()
@@ -26,6 +24,7 @@ visitor_T *init_visitor()
 
     visitor->global_scope = init_scope();
     visitor->scope_stack = init_scope_stack();
+    visitor->current_function = NULL;
 
     return visitor;
 }
@@ -72,6 +71,8 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
         return visitor_visit_term(visitor, node);
     case AST_FOR_LOOP:
         return visitor_visit_for_loop(visitor, (AST_FOR_LOOP_T *)node);
+    case AST_SAVE:
+        return visitor_visit_save(visitor, (AST_SAVE_T *)node);
     default:
         LOG_PRINT("Node of type: [%s] not supported\n", ast_type_to_string(node->type));
         return init_ast(AST_NOOP);
@@ -126,12 +127,37 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
 
     int is_assignment = node->dot_index->type == AST_VARIABLE_ASSIGNMENT;
 
+    int is_function_call = node->dot_index->type == AST_FUNCTION_CALL;
+
     if (is_assignment)
     {
         AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
         variable->variable_name = ((AST_VARIABLE_ASSIGNMENT_T *)node->dot_index)->variable_assignment_name;
         LOG_PRINT("Visiting %s\n", variable->variable_name);
         dot_index = visitor_visit(visitor, variable);
+    }
+    else if (is_function_call)
+    {
+        LOG_PRINT("Visiting function call from function definition\n");
+        // Seach for function definition for variable name
+        AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->dot_expression_variable_name);
+        if (!variable_definition)
+        {
+            log_error("Variable definition for %s not found\n", node->dot_expression_variable_name);
+            exit(1);
+        }
+
+        if (variable_definition->variable_definition_value->type != AST_FUNCTION_DEFINITION)
+        {
+            log_error("Variable definition for %s is not a function\n", node->dot_expression_variable_name);
+            exit(1);
+        }
+
+        AST_FUNCTION_DEFINITION_T *function_definition = (AST_FUNCTION_DEFINITION_T *)(variable_definition->variable_definition_value);
+
+        AST_FUNCTION_CALL_T *function_call = (AST_FUNCTION_CALL_T *)node->dot_index;
+
+        return visitor_visit_function_call_from_definition(visitor, function_definition, function_call);
     }
     else
     {
@@ -163,6 +189,67 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     }
 
     return visitor_visit_variable_with_index(visitor, variable, index);
+}
+
+AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call)
+{
+    LOG_PRINT("Visiting function call from definition\n");
+
+    char *function_to_call_name = function_call->function_call_name;
+
+    AST_FUNCTION_DEFINITION_T *call_definition = NULL;
+
+    if (function_definition->function_definition_body->type == AST_FUNCTION_DEFINITION)
+    {
+        AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)function_definition->function_definition_body;
+        if (strcmp(nested_function_definition->function_definition_name, function_to_call_name) == 0)
+        {
+            call_definition = nested_function_definition;
+        }
+    }
+
+    else if (function_definition->function_definition_body->type == AST_COMPOUND)
+    {
+        AST_COMPOUND_T *compound = (AST_COMPOUND_T *)function_definition->function_definition_body;
+        for (size_t i = 0; i < compound->compound_size; i++)
+        {
+            AST_T *statement = compound->compound_value[i];
+            if (statement->type == AST_FUNCTION_DEFINITION)
+            {
+                AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)statement;
+                if (strcmp(nested_function_definition->function_definition_name, function_to_call_name) == 0)
+                {
+                    call_definition = nested_function_definition;
+                }
+            }
+        }
+    }
+
+    if (call_definition == NULL)
+    {
+        log_error("Function definition for %s not found\n", function_to_call_name);
+        exit(1);
+    }
+
+    LOG_PRINT("Function definition found\n");
+
+    // Add function definition to new scope stack
+    visitor->scope_stack = push_scope_to_stack(visitor->scope_stack, init_scope());
+    visitor_add_function_definition(visitor, (AST_T *)call_definition);
+
+    // Add function variables to new scope stack
+    LOG_PRINT("Adding function variables to scope (length: %d)\n", call_definition->function_definition_variables_size);
+    for (size_t i = 0; i < call_definition->function_definition_variables_size; i++)
+    {
+        LOG_PRINT("Adding function variable %s to scope\n", ((AST_VARIABLE_DEFINITION_T *)(call_definition->function_definition_variables[i]))->variable_definition_variable_name);
+        visitor_add_variable_definition(visitor, (AST_T *)call_definition->function_definition_variables[i]);
+    }
+
+    AST_T *result = visitor_visit_function_call(visitor, function_call);
+
+    // Pop scope stack
+    visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
+    return result;
 }
 
 AST_T *visitor_visit_function_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *node)
@@ -234,6 +321,8 @@ AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINI
 
     AST_T *variable_value = visitor_visit(visitor, node->variable_definition_value);
     node->variable_definition_value = variable_value;
+
+    LOG_PRINT("Variable value type: %s\n", ast_type_to_string(variable_value->type));
 
     visitor_add_variable_definition(visitor, (AST_T *)node);
 
@@ -514,6 +603,8 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
                 exit(1);
             }
 
+            visitor->current_function = function_definition;
+
             size_t arguments_size = function_definition->function_definition_arguments_size;
             AST_T **arguments = calloc(arguments_size, sizeof(struct AST_VARIABLE_DEFINITION_T *));
 
@@ -559,6 +650,14 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
                 visitor_add_variable_definition(visitor, ((AST_VARIABLE_DEFINITION_T *)arguments[i]));
             }
 
+            // Add function variables to scope
+            for (size_t i = 0; i < function_definition->function_definition_variables_size; i++)
+            {
+                AST_VARIABLE_DEFINITION_T *variable_definition = function_definition->function_definition_variables[i];
+                LOG_PRINT("Adding function variable to scope: %s\n", variable_definition->variable_definition_variable_name);
+                visitor_add_variable_definition(visitor, variable_definition);
+            }
+
             LOG_PRINT("New scope after adding arguments\n");
             print_scope(visitor->scope_stack->scope);
 
@@ -574,6 +673,10 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
             }
 
             visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
+            visitor->current_function = NULL;
+
+            LOG_PRINT("Function variables size after call: %d\n", function_definition->function_definition_variables_size);
+
             return function_definition;
         }
     }
@@ -885,6 +988,51 @@ AST_T *visitor_visit_for_loop(visitor_T *visitor, AST_FOR_LOOP_T *node)
 
     // Pop the scope for the for loop
     visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
+
+    return init_ast(AST_NOOP);
+}
+
+AST_T *visitor_visit_save(visitor_T *visitor, AST_SAVE_T *node)
+{
+    LOG_PRINT("Visiting save\n");
+
+    if (!visitor->current_function)
+    {
+        log_error("Save must be called inside a function definition\n");
+        exit(1);
+    }
+
+    AST_VARIABLE_T *save_variable = node->save_value;
+
+    // Search for the variable definition
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(
+        visitor,
+        save_variable->variable_name);
+
+    if (!variable_definition)
+    {
+        log_error("Variable definition for %s not found\n", save_variable->variable_name);
+        exit(1);
+    }
+
+    // Get the value of the variable
+    AST_T *variable_value = variable_definition->variable_definition_value;
+
+    // Create a new variable definition
+    AST_VARIABLE_DEFINITION_T *save_variable_definition = (AST_VARIABLE_DEFINITION_T *)init_ast(AST_VARIABLE_DEFINITION);
+    save_variable_definition->variable_definition_variable_name = save_variable->variable_name;
+    save_variable_definition->variable_definition_value = variable_value;
+    save_variable_definition->variable_definition_variable_count = variable_definition->variable_definition_variable_count;
+
+    LOG_PRINT("Adding variable definition for %s (%s) to function definition\n", save_variable->variable_name, ast_type_to_string(variable_value->type));
+    // Add the variable to the function definition variables
+    // Realloc
+    visitor->current_function->function_definition_variables_size++;
+    visitor->current_function->function_definition_variables = realloc(
+        visitor->current_function->function_definition_variables,
+        (visitor->current_function->function_definition_variables_size + 1) * sizeof(struct AST_VARIABLE_DEFINITION_STRUCT *));
+    // Add the variable to the end of the array
+    visitor->current_function->function_definition_variables[visitor->current_function->function_definition_variables_size - 1] = save_variable_definition;
 
     return init_ast(AST_NOOP);
 }

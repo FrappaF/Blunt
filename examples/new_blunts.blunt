@@ -11,9 +11,9 @@ blunt classJoint(ingredients, helloString)
         smoke ingredients;
     }
 
-    blunt setIngredients(ingredients)
+    blunt setIngredients(ingred)
     {
-        this.ingredients = ingredients;
+        ingredients = ingred;
     }
 
     blunt rollIngredients()
@@ -36,9 +36,9 @@ blunt classJoint(ingredients, helloString)
 }
 
 
-roll ingredients with ["tobacco", "paper", "filter"];
+roll 3 ingredients with ["tobacco", "paper", "filter"];
 
-roll obj with classJoint(ingredients);
+roll obj with classJoint(ingredients, "Hello");
 
 # funtcion definition -> visit_blunt_function_definition + push in the funcion scope the blunt "save" variables.
 # if function call 
@@ -50,5 +50,11 @@ roll obj with classJoint(ingredients);
 
 obj.rollIngredients();
 
+
 println("Ingredients: ", obj.getIngredients());
+
+ingredients.1 = "new tobacco";
+obj.setIngredients(ingredients);
+
+obj.rollIngredients();
 
