@@ -46,6 +46,7 @@ lexer_id_map_T id_map[] = {
     {ID_NOT, TOKEN_NOT},
     {ID_FOR, TOKEN_FOR},
     {ID_FOR_ITERATOR, TOKEN_FOR_ITERATOR},
+    {ID_SAVE, TOKEN_SAVE},
     {"\0", 0} // End of map marker
 };
 
@@ -119,6 +120,10 @@ const char *token_type_to_string(int type)
         return "TOKEN_DOT";
     case TOKEN_FOR:
         return "TOKEN_FOR";
+    case TOKEN_FOR_ITERATOR:
+        return "TOKEN_FOR_ITER";
+    case TOKEN_SAVE:
+        return "TOKEN_SAVE";
     default:
         LOG_PRINT("Unknown token type: %d\n", type);
         return "TOKEN_UNKNOWN";
