@@ -105,6 +105,12 @@ size_t ast_get_size(AST_T *ast)
     case AST_FOR_LOOP:
         size = sizeof(AST_FOR_LOOP_T);
         break;
+    case AST_SAVE:
+        size = sizeof(AST_SAVE_T);
+        break;
+    case AST_DOT_EXPRESSION:
+        size = sizeof(AST_DOT_EXPRESSION_T);
+        break;
     default:
         size = sizeof(AST_T);
         break;
@@ -160,6 +166,8 @@ AST_T *init_ast(int type)
         function_definition->function_definition_arguments = NULL;
         function_definition->function_definition_arguments_size = 0;
         function_definition->function_definition_body = NULL;
+        function_definition->function_definition_variables = NULL;
+        function_definition->function_definition_variables_size = 0;
         return (AST_T *)function_definition;
     }
     case AST_FUNCTION_CALL:
@@ -359,6 +367,13 @@ AST_T *init_ast(int type)
         for_loop_node->for_loop_body = NULL;
         return (AST_T *)for_loop_node;
     }
+    case AST_SAVE:
+    {
+        AST_SAVE_T *save_node = calloc(1, sizeof(struct AST_SAVE_STRUCT));
+        save_node->base = *ast;
+        save_node->save_value = NULL;
+        return (AST_T *)save_node;
+    }
     case AST_NOOP:
     {
         return ast;
@@ -432,6 +447,8 @@ const char *ast_type_to_string(int type)
         return "AST_DOT_EXPRESSION";
     case AST_FOR_LOOP:
         return "AST_FOR_LOOP";
+    case AST_SAVE:
+        return "AST_SAVE";
     case AST_NOOP:
         return "AST_NOOP";
     default:

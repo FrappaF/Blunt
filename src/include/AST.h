@@ -35,6 +35,7 @@ enum AST_TYPES
     AST_IF_ELSE_BRANCH,
     AST_DOT_EXPRESSION,
     AST_FOR_LOOP,
+    AST_SAVE,
     AST_NOOP
 };
 
@@ -116,6 +117,10 @@ typedef struct AST_FUNCTION_DEFINITION_STRUCT
     struct AST_STRUCT *function_definition_body;
     struct AST_VARIABLE_DEFINITION_T **function_definition_arguments;
     size_t function_definition_arguments_size;
+
+    struct AST_VARIABLE_DEFINITION_T **function_definition_variables;
+    size_t function_definition_variables_size;
+
 } AST_FUNCTION_DEFINITION_T;
 
 /**
@@ -343,6 +348,12 @@ typedef struct AST_FOR_LOOP_STRUCT
     struct AST_STRUCT *for_loop_increment;
     struct AST_STRUCT *for_loop_body;
 } AST_FOR_LOOP_T;
+
+typedef struct AST_SAVE_STRUCT
+{
+    AST_T base;
+    struct AST_VARIABLE_T *save_value;
+} AST_SAVE_T;
 
 /**
  * Initializes an AST node with the given type.
