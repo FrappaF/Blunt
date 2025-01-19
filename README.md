@@ -114,6 +114,7 @@ nestedObj.sayHi();
 # Hello mfs!
 ```
 
+**NOTE**: _keeped_ attributes are treated as private fields. It is possible to access them only through methods.
 ## Loops
 
 At the moment exists only one way to iterate over a loop. It is possible to iterate only through a variable (don't know why).
