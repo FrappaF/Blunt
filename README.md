@@ -8,7 +8,7 @@ Yet another useless programming language, just for fun.
     - [Example](#example)
   - [Functions](#functions)
     - [Example](#example-1)
-      - [Example](#example-2)
+    - [Example](#example-2)
   - [Loops](#loops)
     - [Example](#example-3)
   - [Syntax Highlight](#syntax-highlight)
@@ -62,7 +62,7 @@ blunt func_name(var1, var2, ...)
 
 A **_blunt_** is a mix between a class and a method. It can hold both variable and blunts definitions in it. When a blunt is called, if no return value is specified, it returns itself. In this way it is possible to access the methods defined within it.
 
-### Example
+#### Example
 
 ```(blunt)
 blunt classBlunt(initValue)
@@ -87,6 +87,7 @@ roll instance with classBlunt("hello");
 instance.printValue();
 # "hello" 
 ```
+
 
 It is also possible to define blunt classes inside a blunt. (Whoa!)
 #### Example
@@ -118,7 +119,7 @@ nestedObj.sayHi();
 At the moment exists only one way to iterate over a loop. It is possible to iterate only through a variable (don't know why).
 Using the `light` keyword it is possible to use a sort of for loop.
 
-**_Keep in mind that it is not possible to ligh something witouth rolling something before_**
+**_Keep in mind that it is not possible to light something without rolling something before_**
 
 ### Example
 
