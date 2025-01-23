@@ -10,6 +10,7 @@ enum AST_TYPES
     AST_VARIABLE_COUNT,
     AST_VARIABLE_ASSIGNMENT,
     AST_FUNCTION_DEFINITION,
+    AST_RUNTIME_FUNCTION_DEFINITION,
     AST_FUNCTION_CALL,
     AST_RETURN,
     AST_STRING,
@@ -118,10 +119,20 @@ typedef struct AST_FUNCTION_DEFINITION_STRUCT
     struct AST_VARIABLE_T **function_definition_arguments;
     size_t function_definition_arguments_size;
 
-    struct AST_VARIABLE_DEFINITION_T **function_definition_variables;
-    size_t function_definition_variables_size;
+    // struct AST_VARIABLE_DEFINITION_T **function_definition_variables;
+    // size_t function_definition_variables_size;
 
 } AST_FUNCTION_DEFINITION_T;
+
+typedef struct AST_RUNTIME_FUNCTION_DEFINITION_STRUCT
+{
+    AST_T base;
+    char *runtime_function_definition_name;
+    struct AST_STRUCT *runtime_function_definition_body;
+
+    struct AST_VARIABLE_DEFINITION_T **function_definition_variables;
+    size_t function_definition_variables_size;
+} AST_RUNTIME_FUNCTION_DEFINITION_T;
 
 /**
  * @brief Structure representing a return AST node.

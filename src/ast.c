@@ -166,9 +166,18 @@ AST_T *init_ast(int type)
         function_definition->function_definition_arguments = NULL;
         function_definition->function_definition_arguments_size = 0;
         function_definition->function_definition_body = NULL;
-        function_definition->function_definition_variables = NULL;
-        function_definition->function_definition_variables_size = 0;
+
         return (AST_T *)function_definition;
+    }
+    case AST_RUNTIME_FUNCTION_DEFINITION:
+    {
+        AST_RUNTIME_FUNCTION_DEFINITION_T *runtime_function_definition = calloc(1, sizeof(struct AST_RUNTIME_FUNCTION_DEFINITION_STRUCT));
+        runtime_function_definition->base = *ast;
+        runtime_function_definition->runtime_function_definition_name = NULL;
+        runtime_function_definition->runtime_function_definition_body = NULL;
+        runtime_function_definition->function_definition_variables = NULL;
+        runtime_function_definition->function_definition_variables_size = 0;
+        return (AST_T *)runtime_function_definition;
     }
     case AST_FUNCTION_CALL:
     {
@@ -395,6 +404,8 @@ const char *ast_type_to_string(int type)
         return "AST_VARIABLE";
     case AST_FUNCTION_DEFINITION:
         return "AST_FUNCTION_DEFINITION";
+    case AST_RUNTIME_FUNCTION_DEFINITION:
+        return "AST_RUNTIME_FUNCTION_DEFINITION";
     case AST_FUNCTION_CALL:
         return "AST_FUNCTION_CALL";
     case AST_RETURN:
@@ -485,6 +496,17 @@ void ast_print(AST_T *node, int indent)
         for (size_t i = 0; i < function_definition->function_definition_arguments_size; i++)
             ast_print((AST_VARIABLE_DEFINITION_T *)(function_definition->function_definition_arguments[i]), indent + 1);
         ast_print(function_definition->function_definition_body, indent + 1);
+        break;
+    case AST_RUNTIME_FUNCTION_DEFINITION:
+        print_indent(indent + 1);
+        AST_RUNTIME_FUNCTION_DEFINITION_T *runtime_function_definition = (AST_RUNTIME_FUNCTION_DEFINITION_T *)node;
+        LOG_PRINT("Name: %s\n", runtime_function_definition->runtime_function_definition_name);
+        // print variables
+        LOG_PRINT("Runtime variables:\n");
+        for (size_t i = 0; i < runtime_function_definition->function_definition_variables_size; i++)
+            ast_print(runtime_function_definition->function_definition_variables[i], indent + 1);
+        LOG_PRINT("Body:\n");
+        ast_print(runtime_function_definition->runtime_function_definition_body, indent + 1);
         break;
     case AST_FUNCTION_CALL:
         print_indent(indent + 1);
