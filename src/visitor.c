@@ -4,7 +4,7 @@
 #include "include/scope.h"
 #include <stdio.h>
 #include <string.h>
-#include "include/ast.h"
+#include "include/AST.h"
 
 // Function declarations
 static void builtin_print(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
@@ -149,17 +149,17 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
             exit(1);
         }
 
-        if (variable_definition->variable_definition_value->type != AST_FUNCTION_DEFINITION)
+        if (variable_definition->variable_definition_value->type != AST_RUNTIME_FUNCTION_DEFINITION)
         {
             log_error("Variable definition for %s is not a function\n", node->dot_expression_variable_name);
             exit(1);
         }
 
-        AST_FUNCTION_DEFINITION_T *function_definition = (AST_FUNCTION_DEFINITION_T *)(variable_definition->variable_definition_value);
+        AST_RUNTIME_FUNCTION_DEFINITION_T *function_definition = (AST_RUNTIME_FUNCTION_DEFINITION_T *)(variable_definition->variable_definition_value);
         LOG_PRINT("Function definition variable size: %lu\n", function_definition->function_definition_variables_size);
         AST_FUNCTION_CALL_T *function_call = (AST_FUNCTION_CALL_T *)node->dot_index;
 
-        return visitor_visit_function_call_from_definition(visitor, function_definition, function_call);
+        return visitor_visit_runtime_function_call(visitor, function_definition, function_call);
     }
     else
     {
@@ -193,7 +193,73 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     return visitor_visit_variable_with_index(visitor, variable, index);
 }
 
-AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call)
+AST_T *visitor_visit_runtime_function_call(visitor_T *visitor, AST_RUNTIME_FUNCTION_DEFINITION_T *node, AST_FUNCTION_CALL_T *function_call)
+{
+    LOG_PRINT("Visiting runtime function call\n");
+
+    char *function_to_call_name = function_call->function_call_name;
+
+    AST_FUNCTION_DEFINITION_T *call_definition = NULL;
+
+    visitor->current_function = node;
+
+    if (node->runtime_function_definition_body->type == AST_FUNCTION_DEFINITION)
+    {
+        AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)node->runtime_function_definition_body;
+        if (strcmp(nested_function_definition->function_definition_name, function_to_call_name) == 0)
+        {
+            call_definition = nested_function_definition;
+        }
+    }
+
+    else if (node->runtime_function_definition_body->type == AST_COMPOUND)
+    {
+        AST_COMPOUND_T *compound = (AST_COMPOUND_T *)node->runtime_function_definition_body;
+        for (size_t i = 0; i < compound->compound_size; i++)
+        {
+            AST_T *statement = compound->compound_value[i];
+            if (statement->type == AST_FUNCTION_DEFINITION)
+            {
+                AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)statement;
+                if (strcmp(nested_function_definition->function_definition_name, function_to_call_name) == 0)
+                {
+                    LOG_PRINT("Function definition found:\n");
+                    ast_print(nested_function_definition, 0);
+                    call_definition = nested_function_definition;
+                }
+            }
+        }
+    }
+
+    if (call_definition == NULL)
+    {
+        log_error("Function definition for %s not found\n", function_to_call_name);
+        exit(1);
+    }
+
+    LOG_PRINT("Function definition found\n");
+
+    // Add function definition to new scope stack
+    visitor->scope_stack = push_scope_to_stack(visitor->scope_stack, init_scope());
+    visitor_add_function_definition(visitor, (AST_T *)call_definition);
+
+    // Add function variables to new scope stack
+    LOG_PRINT("Adding function variables to scope (length: %lu)\n", node->function_definition_variables_size);
+    for (size_t i = 0; i < node->function_definition_variables_size; i++)
+    {
+        AST_VARIABLE_DEFINITION_T *variable_definition = node->function_definition_variables[i];
+        LOG_PRINT("Adding function variable %s (count %d) to scope\n", variable_definition->variable_definition_variable_name, ((AST_VARIABLE_COUNT_T *)(variable_definition->variable_definition_variable_count))->variable_count_value);
+        visitor_add_variable_definition(visitor, (AST_T *)variable_definition);
+    }
+
+    AST_T *result = visitor_visit_function_call(visitor, function_call);
+
+    // Pop scope stack
+    visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
+    return result;
+}
+
+AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_RUNTIME_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call)
 {
     LOG_PRINT("Visiting function call from definition\n");
 
@@ -201,18 +267,18 @@ AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCT
 
     AST_FUNCTION_DEFINITION_T *call_definition = NULL;
 
-    if (function_definition->function_definition_body->type == AST_FUNCTION_DEFINITION)
+    if (function_definition->runtime_function_definition_body->type == AST_FUNCTION_DEFINITION)
     {
-        AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)function_definition->function_definition_body;
+        AST_FUNCTION_DEFINITION_T *nested_function_definition = (AST_FUNCTION_DEFINITION_T *)function_definition->runtime_function_definition_body;
         if (strcmp(nested_function_definition->function_definition_name, function_to_call_name) == 0)
         {
             call_definition = nested_function_definition;
         }
     }
 
-    else if (function_definition->function_definition_body->type == AST_COMPOUND)
+    else if (function_definition->runtime_function_definition_body->type == AST_COMPOUND)
     {
-        AST_COMPOUND_T *compound = (AST_COMPOUND_T *)function_definition->function_definition_body;
+        AST_COMPOUND_T *compound = (AST_COMPOUND_T *)function_definition->runtime_function_definition_body;
         for (size_t i = 0; i < compound->compound_size; i++)
         {
             AST_T *statement = compound->compound_value[i];
@@ -606,10 +672,16 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
                 exit(1);
             }
 
-            visitor->current_function = function_definition;
+            // Make a copy for runtime function definition
+            AST_RUNTIME_FUNCTION_DEFINITION_T *runtime_function_definition = (AST_RUNTIME_FUNCTION_DEFINITION_T *)init_ast(AST_RUNTIME_FUNCTION_DEFINITION);
+
+            runtime_function_definition->runtime_function_definition_name = function_definition->function_definition_name;
+            runtime_function_definition->runtime_function_definition_body = function_definition->function_definition_body;
+
+            visitor->current_function = runtime_function_definition;
 
             size_t arguments_size = function_definition->function_definition_arguments_size;
-            AST_T **arguments = calloc(arguments_size, sizeof(struct AST_VARIABLE_T *));
+            AST_VARIABLE_DEFINITION_T **arguments = calloc(arguments_size, sizeof(struct AST_VARIABLE_DEFINITION_T *));
 
             for (size_t i = 0; i < arguments_size; i++)
             {
@@ -657,20 +729,19 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
             for (size_t i = 0; i < arguments_size; i++)
             {
                 LOG_PRINT("Adding argument to scope: %s\n",
-                          ((AST_VARIABLE_DEFINITION_T *)arguments[i])->variable_definition_variable_name);
+                          (arguments[i])->variable_definition_variable_name);
 
                 LOG_PRINT("Argument count: %lu\n",
-                          ((AST_VARIABLE_COUNT_T *)(((AST_VARIABLE_DEFINITION_T *)arguments[i])->variable_definition_variable_count))->variable_count_value);
+                          ((AST_VARIABLE_COUNT_T *)((arguments[i])->variable_definition_variable_count))->variable_count_value);
 
-                visitor_add_variable_definition(visitor, ((AST_VARIABLE_DEFINITION_T *)arguments[i]));
-            }
+                // Add the argument to runtime function definition variables
+                runtime_function_definition->function_definition_variables_size++;
+                runtime_function_definition->function_definition_variables = realloc(
+                    runtime_function_definition->function_definition_variables,
+                    sizeof(struct AST_VARIABLE_DEFINITION_STRUCT *) * runtime_function_definition->function_definition_variables_size);
+                runtime_function_definition->function_definition_variables[runtime_function_definition->function_definition_variables_size - 1] = arguments[i];
 
-            // Add function variables to scope
-            for (size_t i = 0; i < function_definition->function_definition_variables_size; i++)
-            {
-                AST_VARIABLE_DEFINITION_T *variable_definition = function_definition->function_definition_variables[i];
-                LOG_PRINT("Adding function variable to scope: %s\n", variable_definition->variable_definition_variable_name);
-                visitor_add_variable_definition(visitor, variable_definition);
+                visitor_add_variable_definition(visitor, (arguments[i]));
             }
 
             LOG_PRINT("New scope after adding arguments\n");
@@ -690,9 +761,10 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
             visitor->scope_stack = pop_scope_from_stack(visitor->scope_stack);
             visitor->current_function = NULL;
 
-            LOG_PRINT("Function variables size after call: %d\n", function_definition->function_definition_variables_size);
+            LOG_PRINT("Returning runtime function definition\n");
+            ast_print(runtime_function_definition, 0);
 
-            return function_definition;
+            return runtime_function_definition;
         }
     }
 
