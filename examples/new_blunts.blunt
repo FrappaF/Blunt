@@ -49,6 +49,8 @@ blunt classJoint(ingredients, helloString)
 
 roll 3 ingredients with ["tobacco", "paper", "filter"];
 
+# The return value should be different from the func def.
+# It should be like runtime_func_def ast to collect runtime keeped values
 roll obj with classJoint(ingredients, "Hello");
 
 obj.rollIngredients();
@@ -57,6 +59,11 @@ obj.rollIngredients();
 ingredients.1 = "pink paper";
 obj.setIngredients(ingredients);
 
+obj.rollIngredients();
+
+roll obj2 with classJoint(["weed", "love", "passion"], "Hehe");
+
+obj2.rollIngredients();
 obj.rollIngredients();
 
 roll nestedObj with obj.nestedClass("Smoked everything");

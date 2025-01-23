@@ -9,7 +9,7 @@ typedef struct VISITOR_STRUCT
 {
     scope_T *global_scope;
     scope_stack_T *scope_stack;
-    AST_FUNCTION_DEFINITION_T *current_function;
+    AST_RUNTIME_FUNCTION_DEFINITION_T *current_function;
 } visitor_T;
 
 /**
@@ -91,6 +91,14 @@ AST_T *visitor_visit_compound(visitor_T *visitor, AST_COMPOUND_T *node);
  * @return The result of the visit.
  */
 AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node);
+
+/**
+ * Visits a runtime function call node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the runtime function call.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_runtime_function_call(visitor_T *visitor, AST_RUNTIME_FUNCTION_DEFINITION_T *node, AST_FUNCTION_CALL_T *function_call);
 
 /**
  * Visits a function definition node in the AST.
@@ -187,7 +195,7 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node);
  * @param function_call The AST node representing the function call.
  * @return The result of the visit.
  */
-AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call);
+AST_T *visitor_visit_function_call_from_definition(visitor_T *visitor, AST_RUNTIME_FUNCTION_DEFINITION_T *function_definition, AST_FUNCTION_CALL_T *function_call);
 
 /**
  * Get a variable definition from the visitor.
