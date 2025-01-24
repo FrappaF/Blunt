@@ -899,6 +899,28 @@ AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node)
         return result;
     }
 
+    if (left->type == AST_STRING && right->type == AST_STRING)
+    {
+        AST_STRING_T *left_string = (AST_STRING_T *)left;
+        AST_STRING_T *right_string = (AST_STRING_T *)right;
+
+        AST_STRING_T *result = (AST_STRING_T *)init_ast(AST_STRING);
+        switch (node->type)
+        {
+        case AST_ADD_OP:
+            LOG_PRINT("Concatenating %s with %s\n", left_string->string_value, right_string->string_value);
+            result->string_value = calloc(strlen(left_string->string_value) + strlen(right_string->string_value) + 1, sizeof(char));
+            strcat(result->string_value, left_string->string_value);
+            strcat(result->string_value, right_string->string_value);
+            break;
+        default:
+            log_error("Unknown operation for strings: %s\n", ast_type_to_string(node->type));
+            exit(1);
+        }
+
+        return result;
+    }
+
     LOG_PRINT("Term: %s\n", ast_type_to_string(node->type));
     return init_ast(AST_NOOP);
 }
@@ -909,7 +931,7 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node)
     switch (node->type)
     {
     case AST_INT:
-        return node;
+        return visitor_visit_int(visitor, (AST_INT_T *)node);
     case AST_VARIABLE:
         return visitor_visit_variable(visitor, (AST_VARIABLE_T *)node);
     case AST_FUNCTION_CALL:
@@ -930,6 +952,8 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node)
         return visitor_visit_not(visitor, (AST_NOT_T *)node);
     case AST_DOT_EXPRESSION:
         return visitor_visit_dot_expression(visitor, (AST_DOT_EXPRESSION_T *)node);
+    case AST_STRING:
+        return visitor_visit_string(visitor, (AST_STRING_T *)node);
     default:
         log_error("Unknown node type: %s\n", ast_type_to_string(node->type));
         exit(1);
