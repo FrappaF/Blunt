@@ -19,8 +19,15 @@ clean:
 	-rm src/*.o
 	-rm -r obj
 
-install:
+install-mac:
 	make clean
 	make
 	mkdir -p /usr/local/bin 
 	cp ./$(exec) /usr/local/bin/blunt
+
+install-linux:
+	make clean
+	make
+	mkdir -p /usr/local/bin 
+	cp ./$(exec) /usr/local/bin/blunt
+	chmod +x /usr/local/bin/blunt
