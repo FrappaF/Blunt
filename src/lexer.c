@@ -1,6 +1,6 @@
-#include "include/lexer.h"
-#include "include/token.h"
-#include "include/logger.h"
+#include "include/lexer/lexer.h"
+#include "include/token/token.h"
+#include "include/io/logger.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,7 +1,7 @@
 #ifndef VISITOR_VARIABLE_H
 #define VISITOR_VARIABLE_H
 
-#include "AST.h"
+#include "../ast/AST.h"
 #include "visitor.h"
 
 /**

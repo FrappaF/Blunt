@@ -1,7 +1,7 @@
 #ifndef VISITOR_FUNCTION_H
 #define VISITOR_FUNCTION_H
 
-#include "AST.h"
+#include "../ast/AST.h"
 #include "visitor.h"
 
 /**

@@ -1,9 +1,9 @@
-#include "include/visitor_variable.h"
-#include "include/logger.h"
-#include "include/scope.h"
+#include "include/visitor/visitor_variable.h"
+#include "include/io/logger.h"
+#include "include/scope/scope.h"
+#include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
-#include "include/AST.h"
 
 AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINITION_T *node)
 {

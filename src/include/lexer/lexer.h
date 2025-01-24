@@ -1,7 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include "token.h"
+#include "../token/token.h"
 
 /**
  * Structure representing the lexer.

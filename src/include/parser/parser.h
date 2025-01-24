@@ -1,8 +1,8 @@
 #ifndef PARSE_H
 #define PARSE_H
 
-#include "lexer.h"
-#include "AST.h"
+#include "../lexer/lexer.h"
+#include "../ast/AST.h"
 
 // Structure representing the parser.
 typedef struct PARSE_STRUCT

@@ -1,9 +1,9 @@
-#include "include/lexer.h"
-#include "include/parser.h"
-#include "include/visitor.h"
-#include "include/logger.h"
-#include "include/io.h"
-#include "include/AST.h"
+#include "include/lexer/lexer.h"
+#include "include/parser/parser.h"
+#include "include/visitor/visitor.h"
+#include "include/io/logger.h"
+#include "include/io/io.h"
+#include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
 

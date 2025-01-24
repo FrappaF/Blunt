@@ -1,10 +1,10 @@
-#include "include/visitor_expression.h"
-#include "include/logger.h"
-#include "include/scope.h"
-#include "include/visitor.h"
+#include "include/visitor/visitor_expression.h"
+#include "include/io/logger.h"
+#include "include/scope/scope.h"
+#include "include/visitor/visitor.h"
+#include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
-#include "include/AST.h"
 
 AST_T *visitor_visit_string(visitor_T *visitor, AST_STRING_T *node)
 {

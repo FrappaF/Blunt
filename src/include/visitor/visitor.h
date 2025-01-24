@@ -1,8 +1,8 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 
-#include "AST.h"
-#include "scope.h"
+#include "../ast/AST.h"
+#include "../scope/scope.h"
 #include <stdlib.h>
 
 /**

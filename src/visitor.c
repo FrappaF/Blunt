@@ -1,10 +1,10 @@
-#include "include/visitor.h"
-#include "include/logger.h"
-#include "include/token.h"
-#include "include/scope.h"
+#include "include/visitor/visitor.h"
+#include "include/io/logger.h"
+#include "include/token/token.h"
+#include "include/scope/scope.h"
+#include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
-#include "include/AST.h"
 
 // Function definitions
 visitor_T *init_visitor()
@@ -69,7 +69,6 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
         return visitor_visit_for_loop(visitor, (AST_FOR_LOOP_T *)node);
     case AST_SAVE:
         return visitor_visit_save(visitor, (AST_SAVE_T *)node);
-
     case AST_DOT_DOT:
         return visitor_visit_dot_dot(visitor, (AST_DOT_DOT_T *)node);
     default:
