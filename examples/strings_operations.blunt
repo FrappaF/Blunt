@@ -1,0 +1,18 @@
+# Strings operations tests
+
+## String concatenation
+roll str1 with "Smoke a";
+roll str2 with "blunt";
+roll str3 with str1 + " " + str2;
+println("Expected value: \"Smoke a blunt\"\nActual value: ", str3);
+
+## String length
+#roll str4 with "Smoke a blunt";
+#roll str5 with len(str4);
+#println("Expected value: 14\nActual value: ", str5);
+
+## String slicing
+#roll smokeablunt with "Smoke a blunt";
+#roll ablunt with smokeablunt.6..;
+#roll smokea with smokeablunt...6;
+#println("Expected value: \"Smoke a blunt\"Actual value:\n", smokea + ablunt);
