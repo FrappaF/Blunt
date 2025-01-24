@@ -1,5 +1,5 @@
-#include "include/token/token.h"
-#include "include/io/logger.h"
+#include "../include/token/token.h"
+#include "../include/io/logger.h"
 #include <stdlib.h>
 
 // Initialize a token with the given type and value

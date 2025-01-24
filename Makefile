@@ -1,12 +1,13 @@
 exec = blunt.out
-sources = $(wildcard src/*.c)
+sources = $(shell find src -name '*.c')
 objects = $(patsubst src/%.c, obj/%.o, $(sources))
 flags = -g
 
 $(exec): $(objects)
 	gcc $(objects) $(flags) -o $(exec)
 
-obj/%.o: src/%.c | obj
+obj/%.o: src/%.c
+	@mkdir -p $(dir $@)
 	gcc -c $(flags) $< -o $@
 
 obj:
@@ -16,7 +17,7 @@ clean:
 	-rm *.out
 	-rm *.o
 	-rm src/*.o
-	-rm obj/*.o
+	-rm -r obj
 
 install:
 	make clean

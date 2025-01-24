@@ -6,10 +6,11 @@
 #include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h> // Add this line for exit function
 
 void print_help()
 {
-    printf("Usage: blunt <filename> [-v]\n");
+    printf("Usage: blunt <filename> [-v for verbose logs] [-l for use only the lexer]\n");
 }
 
 int main(int argc, char *argv[])

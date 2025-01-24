@@ -1,4 +1,4 @@
-#include "include/io/logger.h"
+#include "../include/io/logger.h"
 #include <stdarg.h>
 
 int LOGGING_ENABLED = 0;

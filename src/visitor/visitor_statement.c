@@ -1,7 +1,7 @@
-#include "include/visitor/visitor_statement.h"
-#include "include/io/logger.h"
-#include "include/scope/scope.h"
-#include "include/ast/AST.h"
+#include "../include/visitor/visitor_statement.h"
+#include "../include/io/logger.h"
+#include "../include/scope/scope.h"
+#include "../include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
 
