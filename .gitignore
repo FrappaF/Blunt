@@ -3,4 +3,5 @@ obj/
 
 blunt.out
 
-log.txt
+*.txt
+*.sh
