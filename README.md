@@ -29,7 +29,7 @@ The syntax for instantiate a new variable is the following:
 roll [count] var_name with (=) 1;
 ```
 
-Where `[count]` is an optional indicator for how many var_name you want to instantiate. This could be usefull for anything!
+Where `[count]` is an optional indicator for how many var_name you want to instantiate. This could be usefull for nothing!
 Let's say I have declared 10 variables named snoopy ( `roll 10 snoopy with "HEY"` ) now I can access the i-th value of the i-th snoopy.
 Sounds great isn't it?
 
@@ -45,7 +45,7 @@ println(snoopy.3) # With the dot annotation I can access at the fourth snoopy va
 In this snippet we've created 10 snoopy with the same value each. I can treat this variable as an array of values:
 `["HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY"]`
 
-**NOTE**: On runtime while snoopy values are the same it is represented with a single value. Only when a particular variable value changes it is converted in a real array. I.e. `snoopy.1 = "YAY";` converts the var snoopy in an array prepresented as: `["HEY", "YAY", "HEY" x8]`
+**NOTE**: On runtime while snoopy values are the same it is represented with a single value. Only when a particular value changes it is converted in a real array. I.e. `snoopy.1 = "YAY";` converts the var snoopy from a string variable to an array prepresented as: `["HEY", "YAY", "HEY" x8]`
 
 ## Functions
 
