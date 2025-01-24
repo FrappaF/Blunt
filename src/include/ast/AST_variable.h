@@ -20,7 +20,7 @@ typedef struct AST_VARIABLE_DEFINITION_STRUCT
     AST_T base;
     char *variable_definition_variable_name;
     struct AST_STRUCT *variable_definition_value;
-    struct AST_VARIABLE_COUNT_T *variable_definition_variable_count;
+    struct AST_VARIABLE_COUNT *variable_definition_variable_count;
 } AST_VARIABLE_DEFINITION_T;
 
 /**
