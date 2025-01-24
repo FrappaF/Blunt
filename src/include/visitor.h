@@ -5,6 +5,9 @@
 #include "scope.h"
 #include <stdlib.h>
 
+/**
+ * @brief Structure representing a visitor.
+ */
 typedef struct VISITOR_STRUCT
 {
     scope_T *global_scope;

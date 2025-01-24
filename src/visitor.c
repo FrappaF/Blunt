@@ -9,6 +9,7 @@
 // Function declarations
 static void builtin_print(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
 static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
+static int builtin_len(visitor_T *visitor, AST_T *string);
 void visitor_add_function_definition(visitor_T *visitor, AST_T *node);
 void visitor_add_variable_definition(visitor_T *visitor, AST_T *node);
 
@@ -639,6 +640,13 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
         builtin_println(visitor, node->function_call_arguments, node->function_call_arguments_size);
         return init_ast(AST_NOOP);
     }
+    else if (strcmp(node->function_call_name, "len") == 0)
+    {
+        int lentgh = builtin_len(visitor, node->function_call_arguments[0]);
+        AST_INT_T *result = (AST_INT_T *)init_ast(AST_INT);
+        result->int_value = lentgh;
+        return (AST_T *)result;
+    }
     else
     {
         AST_FUNCTION_DEFINITION_T *function_definition = NULL;
@@ -1244,4 +1252,27 @@ static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t argume
 {
     builtin_print(visitor, arguments, arguments_size);
     printf("\n");
+}
+
+static int builtin_len(visitor_T *visitor, AST_T *node)
+{
+    AST_STRING_T *string = NULL;
+    if (node->type == AST_STRING)
+    {
+        string = (AST_STRING_T *)node;
+    }
+
+    AST_T *visited_ast = visitor_visit(visitor, node);
+    if (visited_ast->type == AST_STRING)
+    {
+        string = (AST_STRING_T *)visited_ast;
+    }
+
+    if (!string)
+    {
+        log_error("len() function only accepts strings\n");
+        exit(1);
+    }
+
+    return strlen(string->string_value) + 1;
 }

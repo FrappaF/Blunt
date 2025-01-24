@@ -7,9 +7,9 @@ roll str3 with str1 + " " + str2;
 println("Expected value: \"Smoke a blunt\"\nActual value: ", str3);
 
 ## String length
-#roll str4 with "Smoke a blunt";
-#roll str5 with len(str4);
-#println("Expected value: 14\nActual value: ", str5);
+roll str4 with "Smoke a blunt";
+roll str5 with len(str4);
+println("Expected value: 14\nActual value: ", str5);
 
 ## String slicing
 #roll smokeablunt with "Smoke a blunt";
