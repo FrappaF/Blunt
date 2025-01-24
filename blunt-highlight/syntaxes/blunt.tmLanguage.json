@@ -56,9 +56,7 @@
 			"patterns": [
 				{
 					"name": "support.function.blunt",
-					"match": "\\b(print|println|free)\\b"
-
-					
+					"match": "\\b(print|println|free|len)\\b"
 				}
 			]
 		},
