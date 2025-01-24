@@ -35,8 +35,10 @@ enum AST_TYPES
     AST_ELSEIF,
     AST_IF_ELSE_BRANCH,
     AST_DOT_EXPRESSION,
+    AST_DOT_DOT_EXPRESSION,
     AST_FOR_LOOP,
     AST_SAVE,
+    AST_DOT_DOT,
     AST_NOOP
 };
 
@@ -360,11 +362,34 @@ typedef struct AST_FOR_LOOP_STRUCT
     struct AST_STRUCT *for_loop_body;
 } AST_FOR_LOOP_T;
 
+/**
+ * @brief Structure representing a save AST node.
+ */
 typedef struct AST_SAVE_STRUCT
 {
     AST_T base;
     struct AST_VARIABLE_T *save_value;
 } AST_SAVE_T;
+
+/**
+ * @brief Structure representing a dot dot annotation AST node.
+ */
+typedef struct AST_DOT_DOT_STRUCT
+{
+    AST_T base;
+} AST_DOT_DOT_T;
+
+/**
+ * @brief Structure representing a dot dot expression AST node.
+ * I.e. "string".3.6 -> "ing"
+ */
+typedef struct AST_DOT_DOT_EXPRESSION_STRUCT
+{
+    AST_T base;
+    char *dot_dot_expression_variable_name;
+    struct AST_STRUCT *dot_dot_first_index;
+    struct AST_STRUCT *dot_dot_last_index;
+} AST_DOT_DOT_EXPRESSION_T;
 
 /**
  * Initializes an AST node with the given type.
