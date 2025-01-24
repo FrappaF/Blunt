@@ -7,10 +7,12 @@ Yet another useless programming language, just for fun.
   - [Variables](#variables)
     - [Example](#example)
   - [Functions](#functions)
-    - [Example](#example-1)
-    - [Example](#example-2)
+      - [Example](#example-1)
+      - [Example](#example-2)
   - [Loops](#loops)
     - [Example](#example-3)
+  - [Strings](#strings)
+    - [Dot dot notation](#dot-dot-notation)
   - [Syntax Highlight](#syntax-highlight)
 
 
@@ -144,6 +146,38 @@ light values
   values.i = values.i * 2;
 }
 ```
+
+## Strings
+I implemented few strings operation like concatenation or slicing.
+Let's dive in:
+```(blunt)
+# Concatenation with +
+roll str1 with "Smoke a";
+roll str2 with "blunt";
+
+println(str1 + " " + str2);
+# Smoke a blunt
+
+roll smokeablunt with "Smoke a blunt"
+
+println(len(smokeablunt)) # built-in len()
+# 14
+
+roll smokea with smokeablunt...6; #from 1st to 5th chars
+roll ablunt with smokeablunt.6..; #from 6th to last chars
+roll abl with smokeablunt.6.10; #from 6th to 9th chars
+
+println(smokea + ablunt);
+# Smoke a blunt
+
+println(abl);
+# a bl
+
+```
+### Dot dot notation
+You may noticed that there's a particular syntax for slices. It is what I called a dot dot notation, another useless feature of this useless language. The dot dot notation permits to take a slice of a string (or array) giving the first index and the last index. For example the line `"Hello".0.3` evaluates in `"Hel"`. Now if I want to use the last index I could write something like `"Hello".3.(len("Hello"))` (evaluates in `"lo"`) but is really ugly. For that reason I implemented the `..` symtax that on runtime will be the maximum (or minimum) index possible for a particular variable. So that `"Hello".3.(len("Hello"))` become `"Hello".3..`. Fantastic! 
+
+**_NOTE_**: The `..` notation could be used also for the first index, in that case it stands for `.0` element. In combination it is possible to write `"Hello"....` to obtain the same string. (Another killer feature here ah!?)
 
 ## Syntax Highlight
 
