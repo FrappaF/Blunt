@@ -1,6 +1,4 @@
 # BLUNT
-![joint](https://github.com/user-attachments/assets/77a2653f-3b20-46e2-a107-c74a0b7cf103)
-
 
 Yet another useless programming language, just for fun.
 
