@@ -1,8 +1,6 @@
-# BLUNT
-
-Yet another useless programming language, just for fun.
 
 - [BLUNT](#blunt)
+- [INSTALLATION](#installation)
 - [BASICS](#basics)
   - [Variables](#variables)
     - [Example](#example)
@@ -16,10 +14,28 @@ Yet another useless programming language, just for fun.
 - [Other examples](#other-examples)
   - [Syntax Highlight](#syntax-highlight)
 
+# BLUNT
+
+Yet another useless programming language, just for fun.
+
+
+# INSTALLATION
+To install the compiler just run:
+```(sh)
+sudo make
+```
+It will create a `blunt.out` file that is the actual compiler and interpreter of the language. 
+I.e. `./blunt.out examples/loops.blunt`
+ 
+If you want to have the `blunt` keyword you can try to run 
+```(sh)
+sudo make install-[linux | mac]
+```
+It will copy the executable in the `local/bin` folder but it depends on your OS.
 
 # BASICS
 
-Here some useless basics in order to use ( why? ) blunt for code.
+Here some useless basics in order to use `blunt` for code ( WHY? )
 
 ## Variables
 
@@ -30,9 +46,7 @@ The syntax for instantiate a new variable is the following:
 roll [count] var_name with (=) 1;
 ```
 
-Where `[count]` is an optional indicator for how many var_name you want to instantiate. This could be usefull for nothing!
-Let's say I have declared 10 variables named snoopy ( `roll 10 snoopy with "HEY"` ) now I can access the i-th value of the i-th snoopy.
-Sounds great isn't it?
+The `[count]` parameter is optional and indicates how many instances of `var_name` you want to create. This is incredibly useful for absolutely nothing! For example, if you declare 10 variables named snoopy (`roll 10 snoopy with "HEY"`), you can access the i-th value of the i-th snoopy. Amazing, right?
 
 ### Example
 
@@ -43,10 +57,10 @@ roll 10 snoopy with "HEY";
 println(snoopy.3) # With the dot annotation I can access at the fourth snoopy value
 ```
 
-In this snippet we've created 10 snoopy with the same value each. I can treat this variable as an array of values:
+In this snippet, we've created 10 snoopies, each with the same value. Think of it as an array of values:
 `["HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY", "HEY"]`
 
-**NOTE**: On runtime while snoopy values are the same it is represented with a single value. Only when a particular value changes it is converted in a real array. I.e. `snoopy.1 = "YAY";` converts the var snoopy from a string variable to an array prepresented as: `["HEY", "YAY", "HEY" x8]`
+**NOTE**: At runtime, while all snoopy values are the same, they are represented by a single value. Only when a specific value changes does it convert into a real array. For example, `snoopy.1 = "YAY";` transforms the snoopy variable from a single string to an array represented as: `["HEY", "YAY", "HEY" x8]`
 
 ## Functions
 
@@ -63,7 +77,7 @@ blunt func_name(var1, var2, ...)
 }
 ```
 
-A **_blunt_** is a mix between a class and a method. It can hold both variable and blunts definitions in it. When a blunt is called, if no return value is specified, it returns itself. In this way it is possible to access the methods defined within it.
+A **_blunt_** is an extraordinary hybrid between a class and a method. It can house both variable and blunt definitions within its majestic confines. When you summon a blunt, if you don't specify a return value, it graciously returns itself. This mind-blowing feature allows you to access the methods defined within it. Isn't that just the most incredible thing you've ever heard? (Spoiler: it's not.)
 
 #### Example
 
@@ -92,7 +106,7 @@ instance.printValue();
 ```
 
 
-It is also possible to define blunt classes inside a blunt. (Whoa!)
+Hold onto your hats, because it gets even more "exciting"! You can define blunt classes inside another blunt. (Whoa! Mind-blowing, right? No, not really.)
 #### Example
 
 ```(blunt)
@@ -116,14 +130,15 @@ smoke nestedObj with obj.nestedClass("Hello mfs!");
 nestedObj.sayHi();
 # Hello mfs!
 ```
+**NOTE**: _kept_ attributes are treated as private fields. You can't just waltz in and access them directly. Oh no, you have to go through the proper channels, i.e., methods. It's like a secret club, but for variables. Exclusive access only!
 
-**NOTE**: _keeped_ attributes are treated as private fields. It is possible to access them only through methods.
 ## Loops
 
-At the moment exists only one way to iterate over a loop. It is possible to iterate only through a variable (don't know why).
-Using the `light` keyword it is possible to use a sort of for loop.
+Prepare to be underwhelmed by the one and only way to iterate over a loop in `blunt`. Yes, you heard that right, there's just one way. And guess what? You can only iterate through a variable. Why? Who knows! But let's pretend it's the most amazing thing ever.
 
-**_Keep in mind that it is not possible to light something without rolling something before_**
+Using the `light` keyword, you can create a sort of for loop. It's like magic, but not really.
+
+**_Keep in mind that it is not possible to light something without rolling something before_**. Yes, you need to roll before you light. It's the rule.
 
 ### Example
 
@@ -139,7 +154,7 @@ light values [using idx < 8]
 # values = [1,2,3,4,5,6,7,8,9,9]
 ```
 
-It's not mandatory to indicate the iterator variable and the iteration condition `[using i < 8]`. If it's not specified the compiler will iinstantiate a default `i` iterator that keeps growing until it reaches the end of list, so that it is possible to write only:
+You don't actually need to specify the iterator variable and the iteration condition `[using i < 8]`. If you don't specify them, the compiler will create a default `i` iterator that keeps growing until it reaches the end of the list. So, you can simply write:
 
 ```(blunt)
 light values
@@ -149,8 +164,8 @@ light values
 ```
 
 ## Strings
-I implemented few strings operation like concatenation or slicing.
-Let's dive in:
+I've implemented a few string operations like concatenation and slicing. Let's dive into those "amazing" features:
+
 ```(blunt)
 # Concatenation with +
 roll str1 with "Smoke a";
