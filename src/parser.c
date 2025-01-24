@@ -103,30 +103,43 @@ AST_T *parser_parse_statement(parser_T *parser)
     case TOKEN_VARIABLE_DEFINITION:
         LOG_PRINT("Parsing variable definition\n");
         return parser_parse_variable_definition(parser);
+
     case TOKEN_ID:
         LOG_PRINT("Parsing variable\n");
         return parser_parse_id(parser);
+
     case TOKEN_STRING:
         LOG_PRINT("Parsing string\n");
         return parser_parse_string(parser);
+
     case TOKEN_INT:
         LOG_PRINT("Parsing int\n");
         return parser_parse_int(parser);
+
     case TOKEN_FUNCTION_DEFINITION:
         LOG_PRINT("Parsing function definition\n");
         return parser_parse_function_definition(parser);
+
     case TOKEN_RETURN:
         LOG_PRINT("Parsing return\n");
         return parser_parse_return(parser);
+
     case TOKEN_IF:
         LOG_PRINT("Parsing ifelse branch\n");
         return parser_parse_ifelse_statement(parser);
+
     case TOKEN_FOR:
         LOG_PRINT("Parsing for loop\n");
         return parser_parse_for_loop(parser);
+
     case TOKEN_SAVE:
         LOG_PRINT("Parsing save\n");
         return parser_parse_save_statement(parser);
+
+    case TOKEN_DOT:
+        LOG_PRINT("Parsing dot expression\n");
+        return parser_parse_dot_expression(parser);
+
     case TOKEN_EOF:
         return NULL;
     default:
@@ -491,6 +504,11 @@ AST_T *parser_parse_factor_with_precedence(parser_T *parser, int precedence)
         node = (AST_NOT_T *)init_ast(AST_NOT);
         ((AST_NOT_T *)node)->not_expression = parser_parse_factor_with_precedence(parser, get_precedence(TOKEN_NOT));
     }
+    else if (parser->current_token->type == TOKEN_DOT)
+    {
+        parser_eat(parser, TOKEN_DOT);
+        node = (AST_DOT_DOT_T *)init_ast(AST_DOT_DOT);
+    }
     else
     {
         fprintf(stderr, "Unexpected token: %s\n", token_type_to_string(parser->current_token->type));
@@ -633,6 +651,24 @@ AST_T *parser_parse_dot_expression(parser_T *parser)
         ast_variable_assignment->variable_assignment_value = parser_parse_expression(parser);
 
         return (AST_T *)ast_variable_assignment;
+    }
+
+    // Dot dot annotation (.3.7)
+    if (parser->current_token->type == TOKEN_DOT)
+    {
+        /** Will be AST_DOT_DOT_EXPRESSION(
+         *  variable_name,
+         *  first index (ast_dot_expression),
+         *  last index (new_ast_dot_expression)
+         */
+
+        parser_eat(parser, TOKEN_DOT);
+        AST_DOT_DOT_EXPRESSION_T *ast_dot_dot_expression = (AST_DOT_DOT_EXPRESSION_T *)init_ast(AST_DOT_DOT_EXPRESSION);
+        ast_dot_dot_expression->dot_dot_expression_variable_name = variable_name;
+        ast_dot_dot_expression->dot_dot_first_index = ast_dot_expression;
+        ast_dot_dot_expression->dot_dot_last_index = parser_parse_expression_with_precedence(parser, 20);
+
+        return (AST_T *)ast_dot_dot_expression;
     }
 
     return (AST_T *)ast_dot_expression_node;

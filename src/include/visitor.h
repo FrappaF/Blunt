@@ -5,6 +5,9 @@
 #include "scope.h"
 #include <stdlib.h>
 
+/**
+ * @brief Structure representing a visitor.
+ */
 typedef struct VISITOR_STRUCT
 {
     scope_T *global_scope;
@@ -50,6 +53,22 @@ AST_T *visitor_visit_variable(visitor_T *visitor, AST_VARIABLE_T *node);
  * @return The result of the visit.
  */
 AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *node, int index);
+
+/**
+ * Visits a variable with max index count node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the variable count.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_last_variable(visitor_T *visitor, AST_VARIABLE_T *node);
+
+/**
+ * Visits a variable with dot dot node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the variable count.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_variable_with_dot_dot(visitor_T *visitor, AST_VARIABLE_T *node, int first_index, int last_index);
 
 /**
  * Visits a variable assignment node in the AST.
@@ -187,6 +206,22 @@ AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node);
  * @return The result of the visit.
  */
 AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node);
+
+/**
+ * Visits a dot dot expresion node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the nested expression.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_dot_dot_expression(visitor_T *visitor, AST_DOT_DOT_EXPRESSION_T *node);
+
+/**
+ * Visits a dot dot annotation node in the AST.
+ * @param visitor The visitor.
+ * @param node The AST node representing the dot dot.
+ * @return The result of the visit.
+ */
+AST_T *visitor_visit_dot_dot(visitor_T *visitor, AST_DOT_DOT_T *node);
 
 /**
  * Visits a function call from a definition node in the AST.

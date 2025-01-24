@@ -23,6 +23,12 @@
 		},
 		{
 			"include": "#variables"
+		},
+		{
+			"include": "#dotdot-notation"
+		},
+		{
+			"include": "#dot-notation"
 		}
 	],
 	"repository": {
@@ -56,9 +62,7 @@
 			"patterns": [
 				{
 					"name": "support.function.blunt",
-					"match": "\\b(print|println|free)\\b"
-
-					
+					"match": "\\b(print|println|free|len)\\b"
 				}
 			]
 		},
@@ -75,6 +79,22 @@
 				{
 					"name": "variable.other.blunt",
 					"match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+				}
+			]
+		},
+		"dotdot-notation":{
+			"patterns": [
+				{
+					"name": "entity.name.function.blunt",
+					"match": "\\.\\."
+				}
+			]
+		},
+		"dot-notation":{
+			"patterns": [
+				{
+					"name": "entity.other.attribute-name",
+					"match": "\\.\\w+"
 				}
 			]
 		}

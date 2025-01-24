@@ -9,6 +9,7 @@
 // Function declarations
 static void builtin_print(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
 static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t arguments_size);
+static int builtin_len(visitor_T *visitor, AST_T *string);
 void visitor_add_function_definition(visitor_T *visitor, AST_T *node);
 void visitor_add_variable_definition(visitor_T *visitor, AST_T *node);
 
@@ -63,6 +64,8 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
         return visitor_visit_variable_assignment(visitor, (AST_VARIABLE_ASSIGNMENT_T *)node);
     case AST_DOT_EXPRESSION:
         return visitor_visit_dot_expression(visitor, (AST_DOT_EXPRESSION_T *)node);
+    case AST_DOT_DOT_EXPRESSION:
+        return visitor_visit_dot_dot_expression(visitor, (AST_DOT_DOT_EXPRESSION_T *)node);
     case AST_ARRAY:
         return visitor_visit_array(visitor, (AST_ARRAY_T *)node);
     case AST_MUL_OP:
@@ -75,6 +78,9 @@ AST_T *visitor_visit(visitor_T *visitor, AST_T *node)
         return visitor_visit_for_loop(visitor, (AST_FOR_LOOP_T *)node);
     case AST_SAVE:
         return visitor_visit_save(visitor, (AST_SAVE_T *)node);
+
+    case AST_DOT_DOT:
+        return visitor_visit_dot_dot(visitor, (AST_DOT_DOT_T *)node);
     default:
         LOG_PRINT("Node of type: [%s] not supported\n", ast_type_to_string(node->type));
         return init_ast(AST_NOOP);
@@ -117,6 +123,9 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
         exit(1);
     }
 
+    AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+    variable->variable_name = node->dot_expression_variable_name;
+
     LOG_PRINT("Variable name: %s\n", node->dot_expression_variable_name);
 
     if (!node->dot_index)
@@ -130,6 +139,8 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     int is_assignment = node->dot_index->type == AST_VARIABLE_ASSIGNMENT;
 
     int is_function_call = node->dot_index->type == AST_FUNCTION_CALL;
+
+    int is_dot_dot = node->dot_index->type == AST_DOT_DOT;
 
     if (is_assignment)
     {
@@ -161,6 +172,10 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
 
         return visitor_visit_runtime_function_call(visitor, function_definition, function_call);
     }
+    else if (is_dot_dot)
+    {
+        dot_index = visitor_visit_last_variable(visitor, variable);
+    }
     else
     {
         dot_index = visitor_visit(visitor, node->dot_index);
@@ -173,8 +188,6 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     }
 
     int index = ((AST_INT_T *)dot_index)->int_value;
-    AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
-    variable->variable_name = node->dot_expression_variable_name;
 
     if (is_assignment)
     {
@@ -191,6 +204,153 @@ AST_T *visitor_visit_dot_expression(visitor_T *visitor, AST_DOT_EXPRESSION_T *no
     }
 
     return visitor_visit_variable_with_index(visitor, variable, index);
+}
+
+AST_T *visitor_visit_dot_dot_expression(visitor_T *visitor, AST_DOT_DOT_EXPRESSION_T *node)
+{
+    LOG_PRINT("Visiting dot dot expression\n");
+
+    if (!node->dot_dot_expression_variable_name)
+    {
+        log_error("Dot dot expression variable name is NULL\n");
+        exit(1);
+    }
+
+    AST_VARIABLE_T *variable = (AST_VARIABLE_T *)init_ast(AST_VARIABLE);
+    variable->variable_name = node->dot_dot_expression_variable_name;
+
+    LOG_PRINT("Variable name: %s\n", node->dot_dot_expression_variable_name);
+
+    if (!node->dot_dot_first_index)
+    {
+        log_error("Dot dot first index is NULL\n");
+        exit(1);
+    }
+
+    if (!node->dot_dot_last_index)
+    {
+        log_error("Dot dot last index is NULL\n");
+        exit(1);
+    }
+
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->dot_dot_expression_variable_name);
+
+    if (!variable_definition)
+    {
+        log_error("Variable definition for %s not found\n", node->dot_dot_expression_variable_name);
+        exit(1);
+    }
+
+    AST_T *dot_dot_first_index = visitor_visit(visitor, node->dot_dot_first_index);
+    AST_T *dot_dot_last_index = visitor_visit(visitor, node->dot_dot_last_index);
+
+    int first_index = -1;
+    int last_index = -1;
+
+    if (dot_dot_first_index->type == AST_INT)
+    {
+        first_index = ((AST_INT_T *)dot_dot_first_index)->int_value;
+    }
+    else if (dot_dot_first_index->type == AST_DOT_DOT)
+    {
+        first_index = 0;
+    }
+    else
+    {
+        log_error("Unsupported type for first index in dot dot notation\n");
+        exit(1);
+    }
+
+    if (dot_dot_last_index->type == AST_INT)
+    {
+        last_index = ((AST_INT_T *)dot_dot_last_index)->int_value;
+    }
+    else if (dot_dot_last_index->type == AST_DOT_DOT)
+    {
+        last_index = builtin_len(visitor, (AST_T *)variable_definition->variable_definition_value) - 1;
+    }
+    else
+    {
+        log_error("Unsupported type for last index in dot dot notation\n");
+        exit(1);
+    }
+
+    return visitor_visit_variable_with_dot_dot(visitor, variable, first_index, last_index);
+}
+
+AST_T *visitor_visit_variable_with_dot_dot(visitor_T *visitor, AST_VARIABLE_T *node, int first_index, int last_index)
+{
+    LOG_PRINT("Visiting variable with dot dot\n");
+
+    if (first_index > last_index)
+    {
+        log_error("First index must be less than last index\n");
+        exit(1);
+    }
+
+    if (first_index < 0 || last_index < 0)
+    {
+        log_error("First index and last index must be greater than or equal to 0\n");
+        exit(1);
+    }
+
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_name);
+
+    int length_of_variable = builtin_len(visitor, (AST_T *)variable_definition->variable_definition_value);
+
+    if (last_index > length_of_variable)
+    {
+        log_error("Last index must be less than the length of the variable\n");
+        exit(1);
+    }
+    if (first_index > length_of_variable)
+    {
+        log_error("First index must be less than the length of the variable\n");
+        exit(1);
+    }
+
+    switch (variable_definition->variable_definition_value->type)
+    {
+    case AST_ARRAY:
+    {
+        // Create a new array with the values from the first index to the last index excluded
+        AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+        AST_ARRAY_T *new_array = (AST_ARRAY_T *)init_ast(AST_ARRAY);
+        new_array->array_size = last_index - first_index;
+        new_array->array_value = calloc(new_array->array_size, sizeof(struct AST_STRUCT *));
+        for (size_t i = 0; i < new_array->array_size; i++)
+        {
+            new_array->array_value[i] = array->array_value[first_index + i];
+        }
+        return (AST_T *)new_array;
+    }
+    case AST_STRING:
+    {
+        // Create a new string with the values from the first index to the last index
+        AST_STRING_T *string = (AST_STRING_T *)variable_definition->variable_definition_value;
+        int length = last_index - first_index;
+        char *new_string = calloc(length + 1, sizeof(char));
+        for (size_t i = 0; i < length; i++)
+        {
+            new_string[i] = string->string_value[first_index + i];
+        }
+        new_string[length] = '\0';
+        AST_STRING_T *new_string_node = (AST_STRING_T *)init_ast(AST_STRING);
+        new_string_node->string_value = new_string;
+        return (AST_T *)new_string_node;
+    }
+    default:
+    {
+        log_error("Variable definition value must be an array or string\n");
+        exit(1);
+    }
+    }
+}
+
+AST_T *visitor_visit_dot_dot(visitor_T *visitor, AST_DOT_DOT_T *node)
+{
+    LOG_PRINT("Visiting dot dot\n");
+    return (AST_T *)node;
 }
 
 AST_T *visitor_visit_runtime_function_call(visitor_T *visitor, AST_RUNTIME_FUNCTION_DEFINITION_T *node, AST_FUNCTION_CALL_T *function_call)
@@ -396,6 +556,36 @@ AST_T *visitor_visit_variable_definition(visitor_T *visitor, AST_VARIABLE_DEFINI
     visitor_add_variable_definition(visitor, (AST_T *)node);
 
     return (AST_T *)node;
+}
+
+AST_T *visitor_visit_last_variable(visitor_T *visitor, AST_VARIABLE_T *node)
+{
+    LOG_PRINT("Visiting last variable\n");
+
+    AST_VARIABLE_DEFINITION_T *variable_definition = visitor_get_variable_definition(visitor, node->variable_name);
+
+    if (!variable_definition)
+    {
+        log_error("Variable '%s' not defined\n", node->variable_name);
+        exit(1);
+    }
+
+    if (variable_definition->variable_definition_value->type == AST_ARRAY)
+    {
+        AST_ARRAY_T *array = (AST_ARRAY_T *)variable_definition->variable_definition_value;
+        return array->array_value[array->array_size - 1];
+    }
+    else if (variable_definition->variable_definition_value->type == AST_STRING)
+    {
+        AST_STRING_T *string = (AST_STRING_T *)variable_definition->variable_definition_value;
+        AST_STRING_T *last_char = (AST_STRING_T *)init_ast(AST_STRING);
+        last_char->string_value = &(string->string_value)[strlen(string->string_value) - 1];
+        return (AST_T *)last_char;
+    }
+    else
+    {
+        return variable_definition->variable_definition_value;
+    }
 }
 
 AST_T *visitor_visit_variable_with_index(visitor_T *visitor, AST_VARIABLE_T *node, int index)
@@ -638,6 +828,13 @@ AST_T *visitor_visit_function_call(visitor_T *visitor, AST_FUNCTION_CALL_T *node
     {
         builtin_println(visitor, node->function_call_arguments, node->function_call_arguments_size);
         return init_ast(AST_NOOP);
+    }
+    else if (strcmp(node->function_call_name, "len") == 0)
+    {
+        int lentgh = builtin_len(visitor, node->function_call_arguments[0]);
+        AST_INT_T *result = (AST_INT_T *)init_ast(AST_INT);
+        result->int_value = lentgh;
+        return (AST_T *)result;
     }
     else
     {
@@ -899,6 +1096,28 @@ AST_T *visitor_visit_term(visitor_T *visitor, AST_T *node)
         return result;
     }
 
+    if (left->type == AST_STRING && right->type == AST_STRING)
+    {
+        AST_STRING_T *left_string = (AST_STRING_T *)left;
+        AST_STRING_T *right_string = (AST_STRING_T *)right;
+
+        AST_STRING_T *result = (AST_STRING_T *)init_ast(AST_STRING);
+        switch (node->type)
+        {
+        case AST_ADD_OP:
+            LOG_PRINT("Concatenating %s with %s\n", left_string->string_value, right_string->string_value);
+            result->string_value = calloc(strlen(left_string->string_value) + strlen(right_string->string_value) + 1, sizeof(char));
+            strcat(result->string_value, left_string->string_value);
+            strcat(result->string_value, right_string->string_value);
+            break;
+        default:
+            log_error("Unknown operation for strings: %s\n", ast_type_to_string(node->type));
+            exit(1);
+        }
+
+        return result;
+    }
+
     LOG_PRINT("Term: %s\n", ast_type_to_string(node->type));
     return init_ast(AST_NOOP);
 }
@@ -909,7 +1128,7 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node)
     switch (node->type)
     {
     case AST_INT:
-        return node;
+        return visitor_visit_int(visitor, (AST_INT_T *)node);
     case AST_VARIABLE:
         return visitor_visit_variable(visitor, (AST_VARIABLE_T *)node);
     case AST_FUNCTION_CALL:
@@ -930,6 +1149,11 @@ AST_T *visitor_visit_factor(visitor_T *visitor, AST_T *node)
         return visitor_visit_not(visitor, (AST_NOT_T *)node);
     case AST_DOT_EXPRESSION:
         return visitor_visit_dot_expression(visitor, (AST_DOT_EXPRESSION_T *)node);
+    case AST_DOT_DOT_EXPRESSION:
+        return visitor_visit_dot_dot_expression(visitor, (AST_DOT_DOT_EXPRESSION_T *)node);
+
+    case AST_STRING:
+        return visitor_visit_string(visitor, (AST_STRING_T *)node);
     default:
         log_error("Unknown node type: %s\n", ast_type_to_string(node->type));
         exit(1);
@@ -1220,4 +1444,37 @@ static void builtin_println(visitor_T *visitor, AST_T **arguments, size_t argume
 {
     builtin_print(visitor, arguments, arguments_size);
     printf("\n");
+}
+
+static int builtin_len(visitor_T *visitor, AST_T *node)
+{
+
+    if (node->type == AST_ARRAY)
+    {
+        AST_ARRAY_T *array = (AST_ARRAY_T *)node;
+        return array->array_size;
+    }
+
+    AST_STRING_T *string = NULL;
+    if (node->type == AST_STRING)
+    {
+        string = (AST_STRING_T *)node;
+        return strlen(string->string_value) + 1;
+    }
+
+    AST_T *visited_ast = visitor_visit(visitor, node);
+    if (visited_ast->type == AST_STRING)
+    {
+        string = (AST_STRING_T *)visited_ast;
+        return strlen(string->string_value) + 1;
+    }
+
+    if (visited_ast->type == AST_ARRAY)
+    {
+        AST_ARRAY_T *array = (AST_ARRAY_T *)visited_ast;
+        return array->array_size;
+    }
+
+    log_error("Unsupported type for len\n");
+    exit(1);
 }

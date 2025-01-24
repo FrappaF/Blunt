@@ -111,6 +111,9 @@ size_t ast_get_size(AST_T *ast)
     case AST_DOT_EXPRESSION:
         size = sizeof(AST_DOT_EXPRESSION_T);
         break;
+    case AST_DOT_DOT:
+        size = sizeof(AST_DOT_DOT_T);
+        break;
     default:
         size = sizeof(AST_T);
         break;
@@ -383,6 +386,21 @@ AST_T *init_ast(int type)
         save_node->save_value = NULL;
         return (AST_T *)save_node;
     }
+    case AST_DOT_DOT:
+    {
+        AST_DOT_DOT_T *dot_dot_node = calloc(1, sizeof(struct AST_DOT_DOT_STRUCT));
+        dot_dot_node->base = *ast;
+        return (AST_T *)dot_dot_node;
+    }
+    case AST_DOT_DOT_EXPRESSION:
+    {
+        AST_DOT_DOT_EXPRESSION_T *dot_dot_expression_node = calloc(1, sizeof(struct AST_DOT_DOT_EXPRESSION_STRUCT));
+        dot_dot_expression_node->base = *ast;
+        dot_dot_expression_node->dot_dot_first_index = NULL;
+        dot_dot_expression_node->dot_dot_last_index = NULL;
+        dot_dot_expression_node->dot_dot_expression_variable_name = NULL;
+        return (AST_T *)dot_dot_expression_node;
+    }
     case AST_NOOP:
     {
         return ast;
@@ -462,6 +480,10 @@ const char *ast_type_to_string(int type)
         return "AST_SAVE";
     case AST_NOOP:
         return "AST_NOOP";
+    case AST_DOT_DOT:
+        return "AST_DOT_DOT";
+    case AST_DOT_DOT_EXPRESSION:
+        return "AST_DOT_DOT_EXPRESSION";
     default:
         LOG_PRINT("Unknown AST type: %d\n", type);
         return "UNKNOWN";
@@ -586,6 +608,15 @@ void ast_print(AST_T *node, int indent)
         break;
     case AST_SAVE:
         ast_print(((AST_SAVE_T *)node)->save_value, indent + 1);
+        break;
+    case AST_DOT_DOT_EXPRESSION:
+        print_indent(indent + 1);
+        LOG_PRINT("Name: %s\n", ((AST_DOT_DOT_EXPRESSION_T *)node)->dot_dot_expression_variable_name);
+        ast_print(((AST_DOT_DOT_EXPRESSION_T *)node)->dot_dot_first_index, indent + 1);
+        ast_print(((AST_DOT_DOT_EXPRESSION_T *)node)->dot_dot_last_index, indent + 1);
+        break;
+
+    case AST_DOT_DOT:
         break;
     default:
         break;
