@@ -12,7 +12,11 @@ roll str5 with len(str4);
 println("Expected value: 14\nActual value: ", str5);
 
 ## String slicing
-#roll smokeablunt with "Smoke a blunt";
-#roll ablunt with smokeablunt.6..;
-#roll smokea with smokeablunt...6;
-#println("Expected value: \"Smoke a blunt\"Actual value:\n", smokea + ablunt);
+roll smokeablunt with "Smoke a blunt";
+# .index for ith character 
+# .. for the first/last character
+roll ablunt with smokeablunt.6..;
+roll smokea with smokeablunt...6;
+roll abl with smokeablunt.6.10;
+println("Expected value: \"Smoke a blunt\"\nActual value:", smokea + ablunt);
+println("Expected value: \"a bl\"\nActual value: ", abl);
