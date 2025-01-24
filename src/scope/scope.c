@@ -1,5 +1,5 @@
-#include "include/logger.h"
-#include "include/scope.h"
+#include "../include/io/logger.h"
+#include "../include/scope/scope.h"
 #include <string.h>
 
 scope_T *init_scope()

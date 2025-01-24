@@ -1,5 +1,5 @@
-#include "include/AST.h"
-#include "include/logger.h"
+#include "../include/ast/AST.h"
+#include "../include/io/logger.h"
 #include <stdlib.h>
 #include <stdio.h>
 
