@@ -31,3 +31,4 @@ install-linux:
 	mkdir -p /usr/local/bin 
 	cp ./$(exec) /usr/local/bin/blunt
 	chmod +x /usr/local/bin/blunt
+
