@@ -1,4 +1,3 @@
-
 - [BLUNT](#blunt)
 - [INSTALLATION](#installation)
 - [BASICS](#basics)
@@ -16,45 +15,44 @@
 
 # BLUNT
 
-Yet another useless programming language, just for fun.
-
+Welcome to BLUNT, yet another useless programming language created just for fun. If you ever wanted to waste your time learning something completely unnecessary, you're in the right place!
 
 # INSTALLATION
-To install the compiler just run:
-```(sh)
+
+To install the compiler, simply run:
+```sh
 sudo make
 ```
-It will create a `blunt.out` file that is the actual compiler and interpreter of the language. 
-I.e. `./blunt.out examples/loops.blunt`
- 
-If you want to have the `blunt` keyword you can try to run 
-```(sh)
+This will create a `blunt.out` file, which is the actual interpreter of the language. For example, you can run:
+```sh
+./blunt.out examples/loops.blunt
+```
+
+If you want to use the `blunt` keyword, you can try running:
+```sh
 sudo make install-[linux | mac]
 ```
-It will copy the executable in the `local/bin` folder but it depends on your OS.
+This will copy the executable to the `local/bin` folder, but it depends on your OS.
 
 # BASICS
 
-Here some useless basics in order to use `blunt` for code ( WHY? )
+Here are some useless basics to help you use `blunt` for coding (but seriously, why?).
 
 ## Variables
 
-Every variable could be managed as an array!
-The syntax for instantiate a new variable is the following:
-
-```(blunt)
+Every variable can be managed as an array! The syntax for instantiating a new variable is as follows:
+```blunt
 roll [count] var_name with (=) 1;
 ```
-
 The `[count]` parameter is optional and indicates how many instances of `var_name` you want to create. This is incredibly useful for absolutely nothing! For example, if you declare 10 variables named snoopy (`roll 10 snoopy with "HEY"`), you can access the i-th value of the i-th snoopy. Amazing, right?
 
 ### Example
 
-```(blunt)
+```blunt
 roll 10 snoopy with "HEY";
 
 # Builtin println useful for printing
-println(snoopy.3) # With the dot annotation I can access at the fourth snoopy value
+println(snoopy.3) # With the dot notation, I can access the fourth snoopy value
 ```
 
 In this snippet, we've created 10 snoopies, each with the same value. Think of it as an array of values:
@@ -64,15 +62,14 @@ In this snippet, we've created 10 snoopies, each with the same value. Think of i
 
 ## Functions
 
-The functions here are called **_blunts_**. The syntax is C like:
-
-```(blunt)
+The functions here are called **_blunts_**. The syntax is C-like:
+```blunt
 # Definition of a new blunt
 blunt func_name(var1, var2, ...)
 {
   # Body of the function
 
-  # Insead of returning a result we smoke that
+  # Instead of returning a result, we smoke that
   smoke result;
 }
 ```
@@ -81,7 +78,7 @@ A **_blunt_** is an extraordinary hybrid between a class and a method. It can ho
 
 #### Example
 
-```(blunt)
+```blunt
 blunt classBlunt(initValue)
 {
   # Every line in the class scope is part of the constructor
@@ -94,7 +91,6 @@ blunt classBlunt(initValue)
   }
 
   println("class initialized");
-
 }
 
 # instance will contain the classBlunt definition
@@ -105,11 +101,11 @@ instance.printValue();
 # "hello" 
 ```
 
-
 Hold onto your hats, because it gets even more "exciting"! You can define blunt classes inside another blunt. (Whoa! Mind-blowing, right? No, not really.)
+
 #### Example
 
-```(blunt)
+```blunt
 blunt class(initValue)
 {
   keep initValue;
@@ -130,6 +126,7 @@ smoke nestedObj with obj.nestedClass("Hello mfs!");
 nestedObj.sayHi();
 # Hello mfs!
 ```
+
 **NOTE**: _kept_ attributes are treated as private fields. You can't just waltz in and access them directly. Oh no, you have to go through the proper channels, i.e., methods. It's like a secret club, but for variables. Exclusive access only!
 
 ## Loops
@@ -142,7 +139,7 @@ Using the `light` keyword, you can create a sort of for loop. It's like magic, b
 
 ### Example
 
-```(blunt)
+```blunt
 roll 10 values with [0,1,2,3,4,5,6,7,8,9];
 
 # Iterate using idx as index var as long as i < 8
@@ -156,7 +153,7 @@ light values [using idx < 8]
 
 You don't actually need to specify the iterator variable and the iteration condition `[using i < 8]`. If you don't specify them, the compiler will create a default `i` iterator that keeps growing until it reaches the end of the list. So, you can simply write:
 
-```(blunt)
+```blunt
 light values
 {
   values.i = values.i * 2;
@@ -164,9 +161,10 @@ light values
 ```
 
 ## Strings
+
 I've implemented a few string operations like concatenation and slicing. Let's dive into those "amazing" features:
 
-```(blunt)
+```blunt
 # Concatenation with +
 roll str1 with "Smoke a";
 roll str2 with "blunt";
@@ -188,16 +186,20 @@ println(smokea + ablunt);
 
 println(abl);
 # a bl
-
 ```
-### Dot dot notation
-You may noticed that there's a particular syntax for slices. It is what I called a **dot dot notation**, another useless feature of this useless language. The dot dot notation permits to take a slice of a string (or array) giving the first index and the last index. For example the line `"Hello".0.3` evaluates in `"Hel"`. Now if I want to use the last index I could write something like `"Hello".3.(len("Hello"))` (evaluates in `"lo"`) but is really ugly. For that reason I implemented the `..` symtax that on runtime will be the maximum (or minimum) index possible for a particular variable. So that `"Hello".3.(len("Hello"))` become `"Hello".3..`. Fantastic! 
 
-**_NOTE_**: The `..` notation could be used also for the first index, in that case it stands for `.0` element. In combination it is possible to write `"Hello"....` to obtain the same string. (Another killer feature here ah!?)
+### Dot dot notation
+
+You may have noticed that there's a particular syntax for slices. It is what I called a **dot dot notation**, another useless feature of this useless language. The dot dot notation permits taking a slice of a string (or array) by giving the first index and the last index. 
+For example, the line `"Hello".0.3` will evaluates to `"Hel"`. 
+Now if I want to use the last index, I could write something like `"Hello".3.(len("Hello"))` (evaluates to `"lo"`) but that is really ugly. For that reason, I implemented the `..` syntax that at runtime will be the maximum (or minimum) index possible for a particular variable. So that `"Hello".3.(len("Hello"))` becomes `"Hello".3..`. Fantastic!
+
+**_NOTE_**: The `..` notation can also be used for the first index, in which case it stands for `.0` element. In combination, it is possible to write `"Hello"....` to obtain the same string. (Another killer feature here, huh?)
 
 # Other examples
+
 You can see a bunch of examples in the `examples` folder.
 
 ## Syntax Highlight
 
-In the `blunt-highlight` folder there is the extension for supporting `blunt`syntax highlight in VSCode. It can be installed by copying this folder into `.vscode/extensions` folder and refresh vscode
+In the `blunt-highlight` folder, there is an extension for supporting `blunt` syntax highlight in VSCode. It can be installed by copying this folder into the `.vscode/extensions` folder and refreshing VSCode.
