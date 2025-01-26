@@ -6,7 +6,7 @@
 #include "include/ast/AST.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h> // Add this line for exit function
+#include <stdlib.h> 
 
 void print_help()
 {
